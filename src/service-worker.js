@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 const CACHE_NAME = "yawm-v1";
 const ASSETS = [
   "/",
