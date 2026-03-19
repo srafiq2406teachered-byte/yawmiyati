@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 // ── Google Fonts ──────────────────────────────────────────────────────────────
 const FONT_LINK = document.createElement("link");
@@ -27,14 +27,556 @@ const HM_EN = ["Muharram","Safar","Rabi al-Awwal","Rabi al-Thani","Jumada al-Ula
 const HM_AR = ["محرم","صفر","ربيع الأول","ربيع الآخر","جمادى الأولى","جمادى الآخرة","رجب","شعبان","رمضان","شوال","ذو القعدة","ذو الحجة"];
 
 const DUAS = [
-  { ar:"رَبِّ زِدْنِي عِلْمًا", en:"My Lord, increase me in knowledge.", src:"Quran 20:114" },
-  { ar:"رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً", en:"Our Lord, give us good in this world and the Hereafter.", src:"Quran 2:201" },
-  { ar:"اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ", en:"O Allah, I ask You for pardon and well-being.", src:"Ibn Majah" },
-  { ar:"حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ", en:"Allah is sufficient for us, and He is the best Disposer of affairs.", src:"Quran 3:173" },
-  { ar:"اللَّهُمَّ أَعِنِّي عَلَى ذِكْرِكَ وَشُكْرِكَ وَحُسْنِ عِبَادَتِكَ", en:"O Allah, help me remember You, be grateful, and worship You well.", src:"Abu Dawud" },
-  { ar:"رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي", en:"My Lord, expand my breast and ease my task.", src:"Quran 20:25-26" },
-  { ar:"اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ", en:"O Allah, I seek refuge in You from anxiety and grief.", src:"Bukhari" },
+  { ar:"رَبِّ زِدْنِي عِلْمًا", en:"My Lord, increase me in knowledge.", src:"Quran 20:114", cat:"Knowledge" },
+  { ar:"رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً", en:"Our Lord, give us good in this world and the Hereafter.", src:"Quran 2:201", cat:"General" },
+  { ar:"اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ", en:"O Allah, I ask You for pardon and well-being.", src:"Ibn Majah", cat:"Health" },
+  { ar:"حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ", en:"Allah is sufficient for us, and He is the best Disposer of affairs.", src:"Quran 3:173", cat:"Trust" },
+  { ar:"اللَّهُمَّ أَعِنِّي عَلَى ذِكْرِكَ وَشُكْرِكَ وَحُسْنِ عِبَادَتِكَ", en:"O Allah, help me remember You, be grateful, and worship You well.", src:"Abu Dawud", cat:"Worship" },
+  { ar:"رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي", en:"My Lord, expand my breast and ease my task.", src:"Quran 20:25-26", cat:"Ease" },
+  { ar:"اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ", en:"O Allah, I seek refuge in You from anxiety and grief.", src:"Bukhari", cat:"Anxiety" },
+  { ar:"رَبِّ إِنِّي لِمَا أَنزَلْتَ إِلَيَّ مِنْ خَيْرٍ فَقِيرٌ", en:"My Lord, I am in need of whatever good You send down to me.", src:"Quran 28:24", cat:"Need" },
+  { ar:"اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْكُفْرِ وَالْفَقْرِ", en:"O Allah, I seek refuge in You from disbelief and poverty.", src:"Abu Dawud", cat:"Protection" },
+  { ar:"رَبَّنَا هَبْ لَنَا مِنْ أَزْوَاجِنَا وَذُرِّيَّاتِنَا قُرَّةَ أَعْيُنٍ", en:"Our Lord, grant us from our spouses and children comfort and coolness of our eyes.", src:"Quran 25:74", cat:"Family" },
+  { ar:"اللَّهُمَّ اجْعَلْنِي مِنَ التَّوَّابِينَ وَاجْعَلْنِي مِنَ الْمُتَطَهِّرِينَ", en:"O Allah, make me of those who repent and make me of those who purify themselves.", src:"Tirmidhi", cat:"Repentance" },
+  { ar:"اللَّهُمَّ إِنِّي أَسْأَلُكَ الْجَنَّةَ وَأَعُوذُ بِكَ مِنَ النَّارِ", en:"O Allah, I ask You for Paradise and seek refuge in You from the Fire.", src:"Abu Dawud", cat:"Afterlife" },
+  { ar:"رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا", en:"Our Lord, do not let our hearts deviate after You have guided us.", src:"Quran 3:8", cat:"Guidance" },
+  { ar:"اللَّهُمَّ أَصْلِحْ لِي دِينِي الَّذِي هُوَ عِصْمَةُ أَمْرِي", en:"O Allah, rectify for me my religion which is the safeguard of my affairs.", src:"Muslim", cat:"Religion" },
+  { ar:"اللَّهُمَّ بَارِكْ لَنَا فِي رِزْقِنَا", en:"O Allah, bless us in our provision.", src:"Ibn Majah", cat:"Provision" },
 ];
+
+// 99 Names of Allah
+const ASMA = [
+  {n:1,  ar:"اللَّهُ",        en:"Allah",         meaning:"The Greatest Name"},
+  {n:2,  ar:"الرَّحْمَٰنُ",   en:"Ar-Rahman",     meaning:"The Entirely Merciful"},
+  {n:3,  ar:"الرَّحِيمُ",     en:"Ar-Raheem",     meaning:"The Especially Merciful"},
+  {n:4,  ar:"الْمَلِكُ",      en:"Al-Malik",      meaning:"The Sovereign"},
+  {n:5,  ar:"الْقُدُّوسُ",    en:"Al-Quddus",     meaning:"The Perfectly Holy"},
+  {n:6,  ar:"السَّلَامُ",     en:"As-Salam",      meaning:"The Source of Peace"},
+  {n:7,  ar:"الْمُؤْمِنُ",    en:"Al-Mumin",      meaning:"The Guarantor of Faith"},
+  {n:8,  ar:"الْمُهَيْمِنُ",  en:"Al-Muhaymin",   meaning:"The Ever-Watchful Guardian"},
+  {n:9,  ar:"الْعَزِيزُ",     en:"Al-Aziz",       meaning:"The All-Mighty"},
+  {n:10, ar:"الْجَبَّارُ",    en:"Al-Jabbar",     meaning:"The Compeller"},
+  {n:11, ar:"الْمُتَكَبِّرُ", en:"Al-Mutakabbir", meaning:"The Greatest in Pride"},
+  {n:12, ar:"الْخَالِقُ",     en:"Al-Khaliq",     meaning:"The Creator"},
+  {n:13, ar:"الْبَارِئُ",     en:"Al-Bari",       meaning:"The Originator"},
+  {n:14, ar:"الْمُصَوِّرُ",   en:"Al-Musawwir",   meaning:"The Fashioner of Forms"},
+  {n:15, ar:"الْغَفَّارُ",    en:"Al-Ghaffar",    meaning:"The Ever-Forgiving"},
+  {n:16, ar:"الْقَهَّارُ",    en:"Al-Qahhar",     meaning:"The All-Prevailing One"},
+  {n:17, ar:"الْوَهَّابُ",    en:"Al-Wahhab",     meaning:"The Supreme Bestower"},
+  {n:18, ar:"الرَّزَّاقُ",    en:"Ar-Razzaq",     meaning:"The Total Provider"},
+  {n:19, ar:"الْفَتَّاحُ",    en:"Al-Fattah",     meaning:"The Opener"},
+  {n:20, ar:"الْعَلِيمُ",     en:"Al-Alim",       meaning:"The All-Knowing"},
+  {n:21, ar:"الْقَابِضُ",     en:"Al-Qabid",      meaning:"The Withholder"},
+  {n:22, ar:"الْبَاسِطُ",     en:"Al-Basit",      meaning:"The Extender"},
+  {n:23, ar:"الْخَافِضُ",     en:"Al-Khafid",     meaning:"The Reducer"},
+  {n:24, ar:"الرَّافِعُ",     en:"Ar-Rafi",       meaning:"The Exalter"},
+  {n:25, ar:"الْمُعِزُّ",     en:"Al-Muizz",      meaning:"The Honourer"},
+  {n:26, ar:"الْمُذِلُّ",     en:"Al-Mudhill",    meaning:"The Dishonourer"},
+  {n:27, ar:"السَّمِيعُ",     en:"As-Sami",       meaning:"The All-Hearing"},
+  {n:28, ar:"الْبَصِيرُ",     en:"Al-Basir",      meaning:"The All-Seeing"},
+  {n:29, ar:"الْحَكَمُ",      en:"Al-Hakam",      meaning:"The Impartial Judge"},
+  {n:30, ar:"الْعَدْلُ",      en:"Al-Adl",        meaning:"The Utterly Just"},
+  {n:31, ar:"اللَّطِيفُ",     en:"Al-Latif",      meaning:"The Subtle One"},
+  {n:32, ar:"الْخَبِيرُ",     en:"Al-Khabir",     meaning:"The All-Aware"},
+  {n:33, ar:"الْحَلِيمُ",     en:"Al-Halim",      meaning:"The Most Forbearing"},
+  {n:34, ar:"الْعَظِيمُ",     en:"Al-Azim",       meaning:"The Magnificent"},
+  {n:35, ar:"الْغَفُورُ",     en:"Al-Ghafur",     meaning:"The Great Forgiver"},
+  {n:36, ar:"الشَّكُورُ",     en:"Ash-Shakur",    meaning:"The Most Appreciative"},
+  {n:37, ar:"الْعَلِيُّ",     en:"Al-Ali",        meaning:"The Most High"},
+  {n:38, ar:"الْكَبِيرُ",     en:"Al-Kabir",      meaning:"The Most Great"},
+  {n:39, ar:"الْحَفِيظُ",     en:"Al-Hafiz",      meaning:"The Preserver"},
+  {n:40, ar:"الْمُقِيتُ",     en:"Al-Muqit",      meaning:"The Sustainer"},
+  {n:41, ar:"الْحَسِيبُ",     en:"Al-Hasib",      meaning:"The Reckoner"},
+  {n:42, ar:"الْجَلِيلُ",     en:"Al-Jalil",      meaning:"The Majestic"},
+  {n:43, ar:"الْكَرِيمُ",     en:"Al-Karim",      meaning:"The Most Generous"},
+  {n:44, ar:"الرَّقِيبُ",     en:"Ar-Raqib",      meaning:"The Watchful One"},
+  {n:45, ar:"الْمُجِيبُ",     en:"Al-Mujib",      meaning:"The Responsive One"},
+  {n:46, ar:"الْوَاسِعُ",     en:"Al-Wasi",       meaning:"The All-Encompassing"},
+  {n:47, ar:"الْحَكِيمُ",     en:"Al-Hakim",      meaning:"The Perfectly Wise"},
+  {n:48, ar:"الْوَدُودُ",     en:"Al-Wadud",      meaning:"The Most Loving"},
+  {n:49, ar:"الْمَجِيدُ",     en:"Al-Majid",      meaning:"The Most Glorious"},
+  {n:50, ar:"الْبَاعِثُ",     en:"Al-Baith",      meaning:"The Resurrector"},
+  {n:51, ar:"الشَّهِيدُ",     en:"Ash-Shahid",    meaning:"The All-Witnessing"},
+  {n:52, ar:"الْحَقُّ",       en:"Al-Haqq",       meaning:"The Absolute Truth"},
+  {n:53, ar:"الْوَكِيلُ",     en:"Al-Wakil",      meaning:"The Trustee"},
+  {n:54, ar:"الْقَوِيُّ",     en:"Al-Qawi",       meaning:"The All-Strong"},
+  {n:55, ar:"الْمَتِينُ",     en:"Al-Matin",      meaning:"The Firm One"},
+  {n:56, ar:"الْوَلِيُّ",     en:"Al-Wali",       meaning:"The Protecting Friend"},
+  {n:57, ar:"الْحَمِيدُ",     en:"Al-Hamid",      meaning:"The Praiseworthy"},
+  {n:58, ar:"الْمُحْصِي",     en:"Al-Muhsi",      meaning:"The All-Enumerating"},
+  {n:59, ar:"الْمُبْدِئُ",    en:"Al-Mubdi",      meaning:"The Originator"},
+  {n:60, ar:"الْمُعِيدُ",     en:"Al-Muid",       meaning:"The Restorer"},
+  {n:61, ar:"الْمُحْيِي",     en:"Al-Muhyi",      meaning:"The Giver of Life"},
+  {n:62, ar:"الْمُمِيتُ",     en:"Al-Mumit",      meaning:"The Taker of Life"},
+  {n:63, ar:"الْحَيُّ",       en:"Al-Hayy",       meaning:"The Ever-Living"},
+  {n:64, ar:"الْقَيُّومُ",    en:"Al-Qayyum",     meaning:"The Self-Subsisting"},
+  {n:65, ar:"الْوَاجِدُ",     en:"Al-Wajid",      meaning:"The Finder"},
+  {n:66, ar:"الْمَاجِدُ",     en:"Al-Majid",      meaning:"The Glorious"},
+  {n:67, ar:"الْوَاحِدُ",     en:"Al-Wahid",      meaning:"The One"},
+  {n:68, ar:"الْأَحَدُ",      en:"Al-Ahad",       meaning:"The Unique"},
+  {n:69, ar:"الصَّمَدُ",      en:"As-Samad",      meaning:"The Eternal"},
+  {n:70, ar:"الْقَادِرُ",     en:"Al-Qadir",      meaning:"The All-Powerful"},
+  {n:71, ar:"الْمُقْتَدِرُ",  en:"Al-Muqtadir",   meaning:"The Omnipotent"},
+  {n:72, ar:"الْمُقَدِّمُ",   en:"Al-Muqaddim",   meaning:"The Expediter"},
+  {n:73, ar:"الْمُؤَخِّرُ",   en:"Al-Muakhkhir",  meaning:"The Delayer"},
+  {n:74, ar:"الْأَوَّلُ",     en:"Al-Awwal",      meaning:"The First"},
+  {n:75, ar:"الْآخِرُ",       en:"Al-Akhir",      meaning:"The Last"},
+  {n:76, ar:"الظَّاهِرُ",     en:"Az-Zahir",      meaning:"The Manifest"},
+  {n:77, ar:"الْبَاطِنُ",     en:"Al-Batin",      meaning:"The Hidden"},
+  {n:78, ar:"الْوَالِي",      en:"Al-Wali",       meaning:"The Governor"},
+  {n:79, ar:"الْمُتَعَالِي",  en:"Al-Mutaali",    meaning:"The Self Exalted"},
+  {n:80, ar:"الْبَرُّ",       en:"Al-Barr",       meaning:"The Source of Goodness"},
+  {n:81, ar:"التَّوَّابُ",    en:"At-Tawwab",     meaning:"The Ever-Pardoning"},
+  {n:82, ar:"الْمُنْتَقِمُ",  en:"Al-Muntaqim",   meaning:"The Avenger"},
+  {n:83, ar:"الْعَفُوُّ",     en:"Al-Afuww",      meaning:"The Pardoner"},
+  {n:84, ar:"الرَّؤُوفُ",     en:"Ar-Rauf",       meaning:"The Most Kind"},
+  {n:85, ar:"مَالِكُ الْمُلْكِ",en:"Malik-ul-Mulk",meaning:"Owner of All Sovereignty"},
+  {n:86, ar:"ذُو الْجَلَالِ", en:"Dhul-Jalal",    meaning:"Lord of Majesty and Bounty"},
+  {n:87, ar:"الْمُقْسِطُ",    en:"Al-Muqsit",     meaning:"The Equitable One"},
+  {n:88, ar:"الْجَامِعُ",     en:"Al-Jami",       meaning:"The Gatherer"},
+  {n:89, ar:"الْغَنِيُّ",     en:"Al-Ghani",      meaning:"The Self-Sufficient"},
+  {n:90, ar:"الْمُغْنِي",     en:"Al-Mughni",     meaning:"The Enricher"},
+  {n:91, ar:"الْمَانِعُ",     en:"Al-Mani",       meaning:"The Preventer"},
+  {n:92, ar:"الضَّارُّ",      en:"Ad-Darr",       meaning:"The Distresser"},
+  {n:93, ar:"النَّافِعُ",     en:"An-Nafi",       meaning:"The Propitious"},
+  {n:94, ar:"النُّورُ",       en:"An-Nur",        meaning:"The Light"},
+  {n:95, ar:"الْهَادِي",      en:"Al-Hadi",       meaning:"The Guide"},
+  {n:96, ar:"الْبَدِيعُ",     en:"Al-Badi",       meaning:"The Incomparable Originator"},
+  {n:97, ar:"الْبَاقِي",      en:"Al-Baqi",       meaning:"The Ever-Lasting"},
+  {n:98, ar:"الْوَارِثُ",     en:"Al-Warith",     meaning:"The Inheritor"},
+  {n:99, ar:"الرَّشِيدُ",     en:"Ar-Rashid",     meaning:"The Guide to the Right Path"},
+];
+
+// Daily Quran verses
+const QURAN_VERSES = [
+  { ar:"إِنَّ مَعَ الْعُسْرِ يُسْرًا",                en:"Indeed, with hardship comes ease.",                  src:"94:6" },
+  { ar:"وَاللَّهُ يُحِبُّ الصَّابِرِينَ",              en:"And Allah loves the patient.",                       src:"3:146" },
+  { ar:"إِنَّ اللَّهَ مَعَ الصَّابِرِينَ",              en:"Indeed, Allah is with the patient.",                 src:"2:153" },
+  { ar:"وَتَوَكَّلْ عَلَى اللَّهِ وَكَفَىٰ بِاللَّهِ وَكِيلًا", en:"And put your trust in Allah — Allah is sufficient as a Disposer.", src:"33:3" },
+  { ar:"فَإِنَّ مَعَ الْعُسْرِ يُسْرًا",               en:"For indeed, with hardship will be ease.",            src:"94:5" },
+  { ar:"وَاللَّهُ خَيْرُ الرَّازِقِينَ",               en:"And Allah is the best of providers.",                src:"62:11" },
+  { ar:"وَهُوَ مَعَكُمْ أَيْنَ مَا كُنتُمْ",           en:"And He is with you wherever you are.",               src:"57:4" },
+  { ar:"قُلْ حَسْبِيَ اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ", en:"Say: Sufficient for me is Allah; there is no deity except Him.", src:"9:129" },
+];
+
+// ── Post-prayer Adhkar data ──────────────────────────────────────────────────
+const ADHKAR_POST_PRAYER = [
+  { id:"istighfar",    ar:"أَسْتَغْفِرُ اللَّهَ",                                   transliteration:"Astaghfirullah",           en:"I seek forgiveness from Allah",                         count:3,  src:"Muslim 591" },
+  { id:"subhanallah",  ar:"سُبْحَانَ اللَّهِ",                                      transliteration:"SubhanAllah",              en:"Glory be to Allah",                                     count:33, src:"Muslim 597" },
+  { id:"alhamdulillah",ar:"الْحَمْدُ لِللَّهِ",                                      transliteration:"Alhamdulillah",            en:"All praise is due to Allah",                            count:33, src:"Muslim 597" },
+  { id:"allahuakbar",  ar:"اللَّهُ أَكْبَرُ",                                       transliteration:"Allahu Akbar",             en:"Allah is the Greatest",                                 count:34, src:"Muslim 597" },
+  { id:"ayat_kursi",   ar:"اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيَّومُ ♥ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ ♥ لَهُ مَا فِي السَّمَٰوَاتِ وَمَا فِي الْأَرْضِ",                                   transliteration:"Ayat al-Kursi (2:255)",    en:"Allah — there is no deity except Him, the Ever-Living, the Sustainer. Neither drowsiness overtakes Him nor sleep. To Him belongs whatever is in the heavens and whatever is on the earth.", count:1, src:"Quran 2:255 — Nasai 9928" },
+  { id:"tahlil",       ar:"لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ ♥ لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ ♥ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ", transliteration:"La ilaha illallah wahdah",  en:"None has the right to be worshipped except Allah, alone, without partner. To Him belongs dominion and praise and He is over all things capable.",    count:1,  src:"Muslim 597" },
+];
+const ADHKAR_MORNING_EVENING = [
+  { id:"sayyid",  ar:"اللَّهُمَّ أَنْتَ رَبَّي لَا إِلَٰهَ إِلَّا أَنْتَ ♥ خَلَقْتَنِي وَأَنَا عَبْدُكَ ♥ وَأَنَا عَلَىٰ عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ", transliteration:"Sayyid al-Istighfar", en:"O Allah, You are my Lord. None has the right to be worshipped except You. You created me and I am Your servant. I am upon Your covenant and promise as best I can.", count:1, src:"Bukhari 6306" },
+  { id:"asbahna", ar:"أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِللَّهِ ♥ وَالْحَمْدُ لِللَّهِ ♥ لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ", transliteration:"Asbahna", en:"We have reached the morning and at this very time unto Allah belongs all sovereignty. All praise is for Allah. None has the right to be worshipped except Allah, alone, without partner.", count:1, src:"Abu Dawud 5071" },
+  { id:"ikhlas",  ar:"قُلْ هُوَ اللَّهُ أَحَدٌ ♥ اللَّهُ الصَّمَدُ ♥ لَمْ يَلِدْ وَلَمْ يُولَدْ ♥ وَلَمْ يَكُن لَهُ كُفُوًا أَحَدٌ", transliteration:"Surah Al-Ikhlas", en:"Say: He is Allah, One. Allah the Eternal Refuge. He neither begets nor is born. Nor is there to Him any equivalent.", count:3, src:"Abu Dawud 5082" },
+  { id:"falaq",   ar:"قُلْ أَعُوذُ بِرَبَّ الْفَلَقِ ♥ مِنْ شَرَّ مَا خَلَقَ ♥ وَمِنْ شَرَّ غَاسِقٍ إِذَا وَقَبَ", transliteration:"Surah Al-Falaq", en:"Say: I seek refuge with the Lord of the daybreak. From the evil of what He created. And from the evil of darkness when it settles.", count:3, src:"Abu Dawud 5082" },
+  { id:"nas",     ar:"قُلْ أَعُوذُ بِرَبَّ النَّاسِ ♥ مَلِكِ النَّاسِ ♥ إِلَٰهِ النَّاسِ", transliteration:"Surah An-Nas", en:"Say: I seek refuge with the Lord of mankind. The Sovereign of mankind. The God of mankind.", count:3, src:"Abu Dawud 5082" },
+];
+const ADHKAR_SLEEP = [
+  { id:"ayat_s",  ar:"اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيَّومُ",   transliteration:"Ayat al-Kursi",    en:"Allah — there is no deity except Him, the Ever-Living, the Sustainer of existence", count:1,  src:"Bukhari 2311" },
+  { id:"kafirun", ar:"قُلْ يَا أَيُّهَا الْكَٰفِرُونَ ♥ لَا أَعْبُدُ مَا تَعْبُدُونَ ♥ وَلَا أَنتُمْ عَابِدُونَ مَا أَعْبُدُ", transliteration:"Surah Al-Kafirun", en:"Say: O you who disbelieve. I do not worship what you worship. Nor are you worshippers of what I worship.", count:1,  src:"Abu Dawud 5055" },
+  { id:"sub_s",   ar:"سُبْحَانَ اللَّهِ",   transliteration:"SubhanAllah",      en:"Glory be to Allah",            count:33, src:"Bukhari 5362" },
+  { id:"ham_s",   ar:"الْحَمْدُ لِللَّهِ",   transliteration:"Alhamdulillah",    en:"All praise is due to Allah",   count:33, src:"Bukhari 5362" },
+  { id:"akb_s",   ar:"اللَّهُ أَكْبَرُ",    transliteration:"Allahu Akbar",     en:"Allah is the Greatest",        count:34, src:"Bukhari 5362" },
+  { id:"bismika", ar:"بِاسْمِكَ اللَّهُمَّ أَحْيَا وَأَمُوتُ",  transliteration:"Bismika Allahumma",en:"In Your name, O Allah, I live and die", count:1, src:"Bukhari 6324" },
+];
+const ADHKAR_ADHAN = [
+  { id:"repeat",  ar:"أَشْهَدُ أَنْ لَا إِلَٰهَ إِلَّا اللَّهُ",  transliteration:"Repeat after muadhin",           en:"Repeat each phrase after the muadhin (say La hawla instead of Hayya alas-Salah)", count:1, src:"Bukhari 611" },
+  { id:"lahawla", ar:"لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ", transliteration:"La hawla wala quwwata",           en:"There is no power or might except with Allah (say this when muadhin says Hayya alas-Salah)", count:1, src:"Muslim 385" },
+  { id:"salawat", ar:"اللَّهُمَّ صَلَّ عَلَى مُحَمَّدٍ",  transliteration:"Allahumma salli ala Muhammad",   en:"O Allah, send blessings upon Muhammad", count:1, src:"Muslim 384" },
+  { id:"dua_adh", ar:"اللَّهُمَّ رَبَّ هَذِهِ الدَّعْوَةِ التَّامَّةِ ♥ آتِ مُحَمَّدًا الْوَسِيلَةَ وَالْفَضِيلَةَ", transliteration:"Allahumma Rabba hadhihid-da'wah", en:"O Allah, Lord of this perfect call. Grant Muhammad the intercession and the highest degree.", count:1, src:"Bukhari 614" },
+];
+const ADHKAR_SALAH_DUAS = {
+  Fajr:    { ar:"اللَّهُمَّ إِنَّي أَسْأَلُكَ عِلْمًا نَافِعًا ♥ وَرِزْقًا طَيَّبًا ♥ وَعَمَلًا مُتَقَبَّلًا", transliteration:"Allahumma inni as'aluka ilman nafi'a", en:"O Allah, I ask You for beneficial knowledge, good provision and accepted deeds", src:"Ibn Majah 925" },
+  Dhuhr:   { ar:"اللَّهُمَّ صَلَّ عَلَى مُحَمَّدٍ ♥ وَعَلَى آلِ مُحَمَّدٍ ♥ كَمَا صَلَّيْتَ عَلَى آلِ إِبْرَاهِيمَ", transliteration:"Allahumma salli ala Muhammad", en:"O Allah, send blessings upon Muhammad and the family of Muhammad, as You sent blessings upon the family of Ibrahim", src:"Bukhari 3370" },
+  Asr:     { ar:"رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا ♥ وَهَبْ لَنَا مِنْ لَدُنْكَ رَحْمَةً", transliteration:"Rabbana la tuzigh qulubana", en:"Our Lord, do not let our hearts deviate after You have guided us. And grant us from Yourself mercy.", src:"Quran 3:8" },
+  Maghrib: { ar:"اللَّهُمَّ إِنَّي أَسْأَلُكَ جَنَّتَكَ ♥ وَأَعُوذُ بِكَ مِنْ نَارِكَ", transliteration:"Allahumma inni as'aluka jannatak", en:"O Allah, I ask You for Paradise and seek Your protection from the Hellfire", src:"Abu Dawud 792" },
+  Isha:    { ar:"اللَّهُمَّ أَسْلَمْتُ نَفْسِي إِلَيْكَ ♥ وَوَجَّهْتُ وَجْهِي إِلَيْكَ ♥ وَفَوَّضْتُ أَمْرِي إِلَيْكَ", transliteration:"Allahumma aslamtu nafsi ilayk", en:"O Allah, I have submitted my soul to You, turned my face to You, and entrusted my affairs to You", src:"Bukhari 247" },
+};
+
+// ── Adhkar Counter Component ──────────────────────────────────────────────────
+// ── Tasbih click sound using Web Audio API ────────────────────────────────────
+function playTasbihClick(type) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (type === "complete") {
+      // Completion — soft rising tone
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(440, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(660, ctx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.18, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.35);
+    } else if (type === "alldone") {
+      // All done — gentle chime
+      [440, 550, 660].forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = "sine";
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0, ctx.currentTime + i*0.12);
+        gain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + i*0.12 + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i*0.12 + 0.4);
+        osc.start(ctx.currentTime + i*0.12);
+        osc.stop(ctx.currentTime + i*0.12 + 0.4);
+      });
+    } else {
+      // Normal tap — short woody click
+      const bufSize = ctx.sampleRate * 0.04;
+      const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let i = 0; i < bufSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufSize, 8);
+      }
+      const src = ctx.createBufferSource();
+      const gain = ctx.createGain();
+      const filter = ctx.createBiquadFilter();
+      src.buffer = buf;
+      filter.type = "bandpass";
+      filter.frequency.value = 800;
+      filter.Q.value = 0.8;
+      src.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+      gain.gain.value = 0.6;
+      src.start();
+    }
+  } catch(e) {}
+}
+
+function AdhkarCounter({ items, title, onBack, T, GOLD, sessionKey }) {
+  // ── Resume: load saved session from localStorage ──────────────────────────
+  const SAVE_KEY = "yawm_adhkar_session_" + (sessionKey || "default");
+  function loadSession() {
+    try {
+      const s = JSON.parse(localStorage.getItem(SAVE_KEY) || "null");
+      if (s && s.itemsKey === items.map(i=>i.id).join(",")) return s;
+    } catch(e) {}
+    return null;
+  }
+  function saveSession(idx, taps, done) {
+    try {
+      localStorage.setItem(SAVE_KEY, JSON.stringify({
+        itemsKey: items.map(i=>i.id).join(","),
+        idx, taps, done,
+      }));
+    } catch(e) {}
+  }
+  function clearSession() {
+    try { localStorage.removeItem(SAVE_KEY); } catch(e) {}
+  }
+
+  const saved = loadSession();
+  const [idx,        setIdx]        = useState(saved ? saved.idx  : 0);
+  const [taps,       setTaps]       = useState(saved ? saved.taps : 0);
+  const [done,       setDone]       = useState(saved ? saved.done : []);
+  const [flash,      setFlash]      = useState(false);
+  const [editMode,   setEditMode]   = useState(false);
+  const [editDraft,  setEditDraft]  = useState("");
+  const [showResume, setShowResume] = useState(!!saved && (saved.idx > 0 || saved.taps > 0));
+  const [soundOn,    setSoundOn]    = useState(() => {
+    try { return localStorage.getItem("yawm_adhkar_sound") !== "off"; } catch(e) { return true; }
+  });
+  function toggleSound() {
+    const next = !soundOn;
+    setSoundOn(next);
+    try { localStorage.setItem("yawm_adhkar_sound", next ? "on" : "off"); } catch(e) {}
+  }
+
+  const item    = items[idx];
+  const pct     = Math.min(taps / item.count, 1);
+  const complete= taps >= item.count;
+  const allDone = done.length === items.length;
+
+  function tap() {
+    if (complete || editMode) return;
+    if (navigator.vibrate) navigator.vibrate(25);
+    if (soundOn) playTasbihClick("tap");
+    const n = taps + 1;
+    setTaps(n);
+    saveSession(idx, n, done);
+    if (n >= item.count) {
+      setFlash(true);
+      if (navigator.vibrate) navigator.vibrate([60, 40, 60]);
+      if (soundOn) playTasbihClick("complete");
+      setTimeout(() => {
+        setFlash(false);
+        setDone(prev => {
+          const nd = [...prev, item.id];
+          const ni = idx < items.length - 1 ? idx + 1 : idx;
+          const nt = idx < items.length - 1 ? 0 : n;
+          if (idx < items.length - 1) { setIdx(ni); setTaps(nt); }
+          saveSession(ni, nt, nd);
+          return nd;
+        });
+      }, 1100);
+    }
+  }
+
+  function skip() {
+    setDone(prev => {
+      const nd = [...prev, item.id];
+      const ni = idx < items.length - 1 ? idx + 1 : idx;
+      if (idx < items.length - 1) { setIdx(ni); setTaps(0); }
+      saveSession(ni, 0, nd);
+      return nd;
+    });
+  }
+
+  function applyEdit() {
+    const v = parseInt(editDraft, 10);
+    if (!isNaN(v) && v >= 0 && v <= item.count) {
+      setTaps(v);
+      saveSession(idx, v, done);
+      if (v >= item.count) {
+        setDone(prev => {
+          const nd = [...prev, item.id];
+          const ni = idx < items.length - 1 ? idx + 1 : idx;
+          if (idx < items.length - 1) { setIdx(ni); setTaps(0); }
+          saveSession(ni, 0, nd);
+          return nd;
+        });
+      }
+    }
+    setEditMode(false);
+    setEditDraft("");
+  }
+
+  // ── Swipe handlers ──────────────────────────────────────────────────────────
+  const swipeRef = useState({ x:0, y:0 })[0];
+  function onTouchStart(e) {
+    swipeRef.x = e.touches[0].clientX;
+    swipeRef.y = e.touches[0].clientY;
+  }
+  function onTouchEnd(e) {
+    const dx = e.changedTouches[0].clientX - swipeRef.x;
+    const dy = e.changedTouches[0].clientY - swipeRef.y;
+    if (Math.abs(dx) < 50 || Math.abs(dy) > Math.abs(dx)) return; // not a horizontal swipe
+    if (dx < 0 && idx < items.length - 1) {
+      // Swipe left → next dhikr
+      if (navigator.vibrate) navigator.vibrate(15);
+      setDone(prev => {
+        const nd = [...prev, item.id];
+        setIdx(i => i + 1);
+        setTaps(0);
+        saveSession(idx + 1, 0, nd);
+        return nd;
+      });
+    } else if (dx > 0 && idx > 0) {
+      // Swipe right → previous dhikr
+      if (navigator.vibrate) navigator.vibrate(15);
+      setDone(prev => prev.filter(id => id !== items[idx-1].id));
+      setIdx(i => i - 1);
+      setTaps(0);
+      saveSession(idx - 1, 0, done.filter(id => id !== items[idx-1].id));
+    }
+  }
+
+  const chart = items.map((it, i) => ({
+    label: it.transliteration.split(" ")[0].slice(0, 7),
+    count: it.count,
+    pct:   done.includes(it.id) ? 100 : i===idx ? Math.round((taps/it.count)*100) : 0,
+    state: done.includes(it.id) ? "done" : i===idx ? "active" : "pending",
+  }));
+  const oPct = Math.round(((done.length + pct) / items.length) * 100);
+
+  if (allDone) {
+    clearSession();
+    if (soundOn) playTasbihClick("alldone");
+    return (
+      <div style={{ padding:"40px 20px", textAlign:"center" }}>
+        <div style={{ fontSize:56, marginBottom:12 }}>🌟</div>
+        <div style={{ fontSize:20, fontWeight:700, color:GOLD, fontFamily:"'Lora',serif", marginBottom:8 }}>الحمد لله</div>
+        <div style={{ fontSize:13, color:T.muted, fontFamily:"sans-serif", marginBottom:24 }}>All adhkar completed. May Allah accept from you.</div>
+        <button onClick={onBack} style={{ padding:"12px 32px", background:GOLD, border:"none", borderRadius:12, color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>Done ✓</button>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ padding:"10px 14px 0" }}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}>
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", paddingBottom:8 }}>
+        <button onClick={onBack} style={{ background:"none", border:"none", cursor:"pointer", color:T.muted, fontSize:12, fontFamily:"sans-serif", display:"flex", alignItems:"center", gap:4 }}>← Back</button>
+        <button onClick={toggleSound} style={{ background:"none", border:"1px solid "+T.border, borderRadius:20, padding:"4px 12px", cursor:"pointer", fontSize:11, color:soundOn?GOLD:T.muted, fontFamily:"sans-serif" }}>
+          {soundOn ? "🔊 Sound on" : "🔇 Sound off"}
+        </button>
+      </div>
+      <div style={{ fontSize:10, color:T.muted, fontFamily:"sans-serif", letterSpacing:2, textTransform:"uppercase", textAlign:"center", marginBottom:4 }}>{title}</div>
+      <div style={{ textAlign:"center", fontSize:9, color:T.muted, fontFamily:"sans-serif", marginBottom:12, opacity:0.7 }}>
+        {idx > 0 && "← "}Swipe to navigate{idx < items.length-1 && " →"}
+      </div>
+
+      {/* Resume banner */}
+      {showResume && (
+        <div style={{ background:GOLD+"12", border:"1px solid "+GOLD+"44", borderRadius:11,
+          padding:"10px 13px", marginBottom:12, display:"flex", alignItems:"center", gap:10 }}>
+          <span style={{ fontSize:16 }}>↩️</span>
+          <div style={{ flex:1 }}>
+            <div style={{ fontSize:12, fontWeight:700, color:GOLD, fontFamily:"sans-serif" }}>Session resumed</div>
+            <div style={{ fontSize:10, color:T.muted, fontFamily:"sans-serif" }}>
+              Continuing from {item.transliteration} — {taps}/{item.count}
+            </div>
+          </div>
+          <button onClick={() => { clearSession(); setIdx(0); setTaps(0); setDone([]); setShowResume(false); }}
+            style={{ background:"none", border:"1px solid "+T.border, borderRadius:7, padding:"4px 8px",
+              color:T.muted, cursor:"pointer", fontSize:10, fontFamily:"sans-serif" }}>
+            Restart
+          </button>
+        </div>
+      )}
+
+      {/* Chart */}
+      <div style={{ background:T.card, borderRadius:13, border:"1px solid "+T.border, padding:"11px 13px 9px", marginBottom:14 }}>
+        <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
+          <span style={{ fontSize:9, color:T.muted, fontFamily:"sans-serif", letterSpacing:2, textTransform:"uppercase" }}>Progress</span>
+          <span style={{ fontSize:11, color:GOLD, fontFamily:"sans-serif", fontWeight:700 }}>{done.length}/{items.length} · {oPct}%</span>
+        </div>
+        <div style={{ display:"flex", alignItems:"flex-end", gap:4, height:56, marginBottom:3 }}>
+          {chart.map((d, i) => {
+            const h   = Math.max(4, Math.round((d.pct/100)*48));
+            const col = d.state==="done" ? "#16a34a" : d.state==="active" ? GOLD : T.borderL;
+            return (
+              <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", height:"100%", justifyContent:"flex-end", gap:2 }}>
+                <div style={{ fontSize:7, color:d.pct>0?col:"transparent", fontFamily:"sans-serif", fontWeight:700, lineHeight:1 }}>{d.state==="done"?"✓":d.pct>0?d.pct+"%":""}</div>
+                <div style={{ width:"100%", borderRadius:"3px 3px 0 0", height:h, background:col, transition:"height 0.25s ease, background 0.3s", boxShadow:d.state==="active"&&d.pct>0?"0 0 6px "+GOLD+"88":"none" }} />
+              </div>
+            );
+          })}
+        </div>
+        <div style={{ display:"flex", gap:4, borderTop:"1px solid "+T.borderL, paddingTop:4 }}>
+          {chart.map((d, i) => {
+            const col = d.state==="done"?"#16a34a":d.state==="active"?GOLD:T.muted;
+            return (
+              <div key={i} style={{ flex:1, textAlign:"center" }}>
+                <div style={{ fontSize:6, color:col, fontFamily:"sans-serif", fontWeight:d.state==="active"?700:400, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{d.label}</div>
+                <div style={{ fontSize:6, color:T.muted, fontFamily:"sans-serif" }}>×{d.count}</div>
+              </div>
+            );
+          })}
+        </div>
+        <div style={{ marginTop:6, height:5, background:T.alt, borderRadius:3, overflow:"hidden" }}>
+          <div style={{ height:"100%", borderRadius:3, background:"linear-gradient(to right,"+GOLD+",#16a34a)", width:oPct+"%", transition:"width 0.3s ease" }} />
+        </div>
+      </div>
+
+      <div style={{ textAlign:"center", fontSize:12, color:GOLD, fontFamily:"sans-serif", fontWeight:600, letterSpacing:1, marginBottom:4 }}>{item.transliteration}</div>
+
+      {/* Arabic — full text shown, page scrolls */}
+      <div style={{ textAlign:"center", color:T.text, fontFamily:"'Amiri Quran','Amiri',serif",
+        direction:"rtl", padding:"14px 16px", marginBottom:8,
+        fontSize: item.ar.length > 150 ? 16 : item.ar.length > 80 ? 19 : item.ar.length > 40 ? 24 : 28,
+        background:T.alt, borderRadius:12, border:"1px solid "+T.border,
+      }}>
+        {item.ar.split("♥").map(function(phrase, pi) {
+          const parts = item.ar.split("♥");
+          return (
+            <div key={pi} style={{
+              lineHeight:"2.4",
+              paddingBottom: pi < parts.length - 1 ? 4 : 0,
+              borderBottom: pi < parts.length - 1 ? "1px solid " + T.border + "44" : "none",
+              marginBottom: pi < parts.length - 1 ? 4 : 0,
+              wordBreak:"break-word",
+              overflowWrap:"break-word",
+              whiteSpace:"normal",
+            }}>
+              {phrase.trim()}
+            </div>
+          );
+        })}
+      </div>
+
+      <div style={{ textAlign:"center", fontSize:11, color:T.muted, fontStyle:"italic", fontFamily:"'Lora',serif", marginBottom:3, padding:"0 12px", lineHeight:"1.6" }}>"{item.en}"</div>
+      <div style={{ textAlign:"center", fontSize:10, color:T.muted, fontFamily:"sans-serif", marginBottom:16 }}>— {item.src}</div>
+
+      {/* Full-screen tap zone + ring — the whole area is tappable */}
+      <button onClick={tap} disabled={complete || editMode} style={{
+        display:"flex", flexDirection:"column", alignItems:"center",
+        width:"100%", padding:"20px 0 16px",
+        background: complete ? "#16a34a12" : flash ? GOLD+"22" : T.alt,
+        border:"2px dashed " + (complete ? "#16a34a44" : flash ? GOLD : T.border),
+        borderRadius:16, cursor:complete?"default":"pointer",
+        transition:"background 0.2s, border-color 0.2s",
+        marginBottom:10,
+      }}>
+        {/* Ring inside tap zone */}
+        <div style={{ position:"relative", width:130, height:130, marginBottom:8 }}>
+          <svg width="130" height="130" style={{ transform:"rotate(-90deg)", position:"absolute" }}>
+            <circle cx="65" cy="65" r="50" fill="none" stroke={T.borderL} strokeWidth="7" />
+            <circle cx="65" cy="65" r="50" fill="none" stroke={complete?"#16a34a":GOLD} strokeWidth="7"
+              strokeDasharray={String(2*Math.PI*50)} strokeDashoffset={String(2*Math.PI*50 - pct*2*Math.PI*50)}
+              strokeLinecap="round" style={{ transition:"stroke-dashoffset 0.2s ease, stroke 0.3s" }} />
+          </svg>
+          <div style={{
+            position:"absolute", inset:10, borderRadius:"50%",
+            background:flash?"#16a34a":complete?"#16a34a":GOLD,
+            display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
+            transition:"background 0.2s, transform 0.1s",
+            transform:flash?"scale(1.06)":"scale(1)",
+            boxShadow:"0 4px 14px "+GOLD+"44",
+          }}>
+            {complete ? <span style={{ fontSize:28 }}>✓</span>
+              : <><span style={{ fontSize:26, fontWeight:800, color:"#fff", fontFamily:"sans-serif", lineHeight:1 }}>{taps}</span><span style={{ fontSize:10, color:"rgba(255,255,255,0.8)", fontFamily:"sans-serif" }}>/ {item.count}</span></>}
+          </div>
+        </div>
+        {!complete && <div style={{ fontSize:11, color:T.muted, fontFamily:"sans-serif", letterSpacing:1 }}>TAP ANYWHERE HERE</div>}
+        {complete && <div style={{ fontSize:12, color:"#16a34a", fontFamily:"sans-serif", fontWeight:600 }}>✓ Moving to next...</div>}
+      </button>
+
+      {/* Manual edit + skip + reset row */}
+      {!complete && !editMode && (
+        <div style={{ display:"flex", gap:6, marginBottom:8 }}>
+          <button onClick={() => { setEditDraft(String(taps)); setEditMode(true); }} style={{
+            flex:1, padding:"10px 6px", background:T.alt, border:"1px solid "+T.border,
+            borderRadius:10, color:T.muted, cursor:"pointer", fontSize:11, fontFamily:"sans-serif",
+          }}>✏️ Edit count</button>
+          <button onClick={() => setTaps(0)} style={{
+            flex:1, padding:"10px 6px", background:T.alt, border:"1px solid "+T.border,
+            borderRadius:10, color:T.muted, cursor:"pointer", fontSize:11, fontFamily:"sans-serif",
+          }}>↺ Reset</button>
+          <button onClick={skip} style={{
+            flex:1, padding:"10px 6px", background:T.alt, border:"1px solid "+T.border,
+            borderRadius:10, color:T.muted, cursor:"pointer", fontSize:11, fontFamily:"sans-serif",
+          }}>⏭ Skip</button>
+        </div>
+      )}
+
+      {/* Manual count entry */}
+      {editMode && (
+        <div style={{ background:T.card, border:"1px solid "+T.border, borderRadius:12, padding:"14px", marginBottom:8 }}>
+          <div style={{ fontSize:11, color:T.muted, fontFamily:"sans-serif", marginBottom:8, textAlign:"center" }}>
+            Enter count manually (0 – {item.count})
+          </div>
+          <div style={{ display:"flex", gap:8 }}>
+            <input type="number" min="0" max={item.count} value={editDraft}
+              onChange={e => setEditDraft(e.target.value)}
+              style={{ flex:1, padding:"10px", border:"1px solid "+T.border, borderRadius:8,
+                background:T.alt, color:T.text, fontSize:18, textAlign:"center", outline:"none" }} />
+            <button onClick={applyEdit} style={{
+              padding:"10px 18px", background:GOLD, border:"none", borderRadius:8,
+              color:"#fff", cursor:"pointer", fontSize:13, fontWeight:700, fontFamily:"sans-serif",
+            }}>Set</button>
+            <button onClick={() => { setEditMode(false); setEditDraft(""); }} style={{
+              padding:"10px 14px", background:T.alt, border:"1px solid "+T.border, borderRadius:8,
+              color:T.muted, cursor:"pointer", fontSize:13, fontFamily:"sans-serif",
+            }}>✕</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 // ── Date helpers ──────────────────────────────────────────────────────────────
 function dateStr(d) {
@@ -277,6 +819,7 @@ const DEED_POINTS = {
   sadaqah_daily:8,
   fast_today:10,
   ramadan_fast:12,
+  eid_prayer:20,
 };
 
 // ── Adult gamified — achievement badges ───────────────────────────────────────
@@ -299,6 +842,7 @@ const ACHIEVEMENTS = [
     for(let i=0;i<365;i++){const h=hist[dateStr(d)]||{};if(h["witr"])streak++;else break;d=addDays(d,-1);}
     return streak>=30;
   }},
+  { id:"masjid_regular", icon:"🕌", label:"Masjid Regular",  desc:"Prayed all 5 in Masjid in a day", check:(hist) => Object.values(hist).some(function(h){ const m=h._masjid||[]; return m.length>=5; }) },
 ];
 
 // ── Quran unlocks at point milestones ─────────────────────────────────────────
@@ -316,13 +860,155 @@ const QURAN_UNLOCKS = [
 
 // ── Gamified adult theme ───────────────────────────────────────────────────────
 const GAMIFIED_THEME = {
-  bg:"#f5f3ff", card:"#ffffff", alt:"#ede9fe",
-  border:"#c4b5fd", borderL:"#ddd6fe",
-  text:"#1e1b4b", sub:"#4338ca", muted:"#a5b4fc",
-  gold:"#6366f1", accent:"#8b5cf6",
-  salahBg:"#eef2ff", salahAc:"#4f46e5", salahBd:"#c7d2fe",
-  headerBg:"linear-gradient(135deg,#4f46e5,#7c3aed)",
+  light: {
+    bg:"#f5f3ff", card:"#ffffff", alt:"#ede9fe",
+    border:"#c4b5fd", borderL:"#ddd6fe",
+    text:"#1e1b4b", sub:"#4338ca", muted:"#a5b4fc",
+    gold:"#6366f1", accent:"#8b5cf6",
+    salahBg:"#eef2ff", salahAc:"#4f46e5", salahBd:"#c7d2fe",
+    headerBg:"linear-gradient(135deg,#4f46e5,#7c3aed)",
+  },
+  dark: {
+    bg:"#0f0e1a", card:"#1a1830", alt:"#221f38",
+    border:"#312e5a", borderL:"#28254a",
+    text:"#e8e4ff", sub:"#9896d8", muted:"#5a5880",
+    gold:"#818cf8", accent:"#a78bfa",
+    salahBg:"#0d1326", salahAc:"#818cf8", salahBd:"#312e5a",
+    headerBg:"linear-gradient(135deg,#312e81,#4c1d95)",
+  },
 };
+
+// ── Qibla Finder ─────────────────────────────────────────────────────────────
+function QiblaFinder({ T, GOLD }) {
+  const [angle,   setAngle]   = React.useState(null);
+  const [heading, setHeading] = React.useState(null);
+  const [error,   setError]   = React.useState(null);
+  const [loading, setLoading] = React.useState(false);
+
+  function getQibla() {
+    setLoading(true); setError(null);
+    if (!navigator.geolocation) { setError("Geolocation not supported"); setLoading(false); return; }
+    navigator.geolocation.getCurrentPosition(function(pos) {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+      // Kaaba coords
+      const KAABA_LAT = 21.4225;
+      const KAABA_LNG = 39.8262;
+      const dLng = (KAABA_LNG - lng) * Math.PI / 180;
+      const lat1 = lat * Math.PI / 180;
+      const lat2 = KAABA_LAT * Math.PI / 180;
+      const y = Math.sin(dLng) * Math.cos(lat2);
+      const x = Math.cos(lat1)*Math.sin(lat2) - Math.sin(lat1)*Math.cos(lat2)*Math.cos(dLng);
+      const qiblaAngle = ((Math.atan2(y, x) * 180 / Math.PI) + 360) % 360;
+      setAngle(Math.round(qiblaAngle));
+      setLoading(false);
+      // Try device compass
+      if (typeof DeviceOrientationEvent !== "undefined" && DeviceOrientationEvent.requestPermission) {
+        DeviceOrientationEvent.requestPermission().then(function(perm) {
+          if (perm === "granted") {
+            window.addEventListener("deviceorientationabsolute", function(e) {
+              if (e.alpha !== null) setHeading(Math.round(e.alpha));
+            }, { once:false });
+          }
+        }).catch(function() {});
+      } else {
+        window.addEventListener("deviceorientationabsolute", function(e) {
+          if (e.alpha !== null) setHeading(Math.round(e.alpha));
+        }, { once:false });
+      }
+    }, function() { setError("Could not get location. Please enable location access."); setLoading(false); });
+  }
+
+  const qiblaFromNorth = angle !== null ? angle : null;
+  const deviceHeading  = heading !== null ? heading : null;
+  const needleAngle    = qiblaFromNorth !== null && deviceHeading !== null
+    ? qiblaFromNorth - deviceHeading : qiblaFromNorth;
+
+  return (
+    <div>
+      {!angle && !loading && (
+        <div style={{ textAlign:"center", padding:"20px 0" }}>
+          <div style={{ fontSize:48, marginBottom:12 }}>🧭</div>
+          <div style={{ fontSize:14, color:T.text, fontFamily:"'Lora',serif", marginBottom:6 }}>Find the Qibla</div>
+          <div style={{ fontSize:11, color:T.muted, fontFamily:"sans-serif", marginBottom:20, lineHeight:"1.6" }}>
+            Uses your location to calculate the direction of the Kaaba in Makkah
+          </div>
+          <button onClick={getQibla} style={{ padding:"12px 28px", background:GOLD, border:"none",
+            borderRadius:12, color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer", fontFamily:"'Lora',serif" }}>
+            Find Qibla Direction
+          </button>
+        </div>
+      )}
+      {loading && (
+        <div style={{ textAlign:"center", padding:"40px 0", color:T.muted, fontFamily:"sans-serif" }}>
+          Getting location...
+        </div>
+      )}
+      {error && (
+        <div style={{ background:"#fef2f2", border:"1px solid #fecaca", borderRadius:10,
+          padding:"12px 14px", fontSize:12, color:"#dc2626", fontFamily:"sans-serif" }}>
+          ⚠️ {error}
+        </div>
+      )}
+      {angle !== null && !loading && (
+        <div style={{ textAlign:"center" }}>
+          {/* Compass */}
+          <div style={{ position:"relative", width:220, height:220, margin:"0 auto 16px" }}>
+            {/* Compass rose */}
+            <svg width="220" height="220" viewBox="0 0 220 220">
+              <circle cx="110" cy="110" r="100" fill={T.alt} stroke={T.border} strokeWidth="2"/>
+              <circle cx="110" cy="110" r="2" fill={GOLD}/>
+              {["N","E","S","W"].map((d,i) => {
+                const a = i * 90 * Math.PI / 180;
+                const x = 110 + 85 * Math.sin(a);
+                const y = 110 - 85 * Math.cos(a);
+                return <text key={d} x={x} y={y+4} textAnchor="middle" fontSize="13"
+                  fontWeight="700" fill={d==="N"?GOLD:T.muted} fontFamily="sans-serif">{d}</text>;
+              })}
+              {/* Qibla needle */}
+              <g transform={`rotate(${needleAngle || 0} 110 110)`}>
+                <polygon points="110,20 104,110 116,110" fill={GOLD} opacity="0.9"/>
+                <polygon points="110,200 104,110 116,110" fill={T.border}/>
+              </g>
+              {/* Kaaba icon at tip */}
+              <g transform={`rotate(${needleAngle || 0} 110 110)`}>
+                <text x="110" y="16" textAnchor="middle" fontSize="14">🕋</text>
+              </g>
+            </svg>
+          </div>
+
+          <div style={{ fontSize:28, fontWeight:800, color:GOLD, fontFamily:"sans-serif", marginBottom:4 }}>
+            {angle}°
+          </div>
+          <div style={{ fontSize:13, color:T.sub, fontFamily:"sans-serif", marginBottom: deviceHeading ? 4 : 16 }}>
+            Qibla is {angle}° from North
+          </div>
+          {deviceHeading && (
+            <div style={{ fontSize:11, color:T.muted, fontFamily:"sans-serif", marginBottom:16 }}>
+              Device heading: {deviceHeading}° · Rotate phone until needle points to 🕋
+            </div>
+          )}
+          <button onClick={getQibla} style={{ padding:"8px 20px", background:T.alt,
+            border:"1px solid "+T.border, borderRadius:10, color:T.muted,
+            cursor:"pointer", fontSize:12, fontFamily:"sans-serif" }}>
+            ↺ Recalculate
+          </button>
+
+          <div style={{ background:GOLD+"10", borderRadius:12, border:"1px solid "+GOLD+"33",
+            padding:"12px 14px", marginTop:14, textAlign:"center" }}>
+            <div style={{ fontSize:13, color:GOLD, fontFamily:"'Amiri',serif",
+              direction:"rtl", lineHeight:"2", marginBottom:4 }}>
+              فَوَلِّ وَجْهَكَ شَطْرَ الْمَسْجِدِ الْحَرَامِ
+            </div>
+            <div style={{ fontSize:10, color:T.muted, fontFamily:"sans-serif", fontStyle:"italic" }}>
+              "Turn your face toward the Sacred Mosque" — Quran 2:144
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 // ── Animated Checkbox ─────────────────────────────────────────────────────────
 function Checkbox({ checked, color, size }) {
@@ -376,6 +1062,16 @@ PRAYERS.forEach(p => p.rows.filter(r => r.type === "F").forEach(r => FARD_IDS.pu
 // ── Main App ──────────────────────────────────────────────────────────────────
 export default function App() {
   const [theme, setTheme]     = useState(() => load("yawm_theme", "light"));
+  const [onboardStep, setOnboardStep] = useState(() => load("yawm_onboarded", false) ? null : 0);
+  function finishOnboard() { save("yawm_onboarded", true); setOnboardStep(null); }
+  const [gender, setGender]   = useState(() => load("yawm_gender", "male"));
+  const [fontScale, setFontScale] = useState(() => load("yawm_font_scale", 1.0));
+  const [isExempt, setIsExempt] = useState(() => load("yawm_exempt_" + (new Date().toISOString().slice(0,10)), false));
+  function toggleExempt() {
+    const next = !isExempt;
+    setIsExempt(next);
+    save("yawm_exempt_" + TODAY_KEY, next);
+  }
   const [tab, setTab]         = useState("today");
   const [customs, setCustoms] = useState(() => load("yawm_custom", []));
   // Mode declared early so hist/notes can use it
@@ -414,36 +1110,257 @@ export default function App() {
 
   const [kidsAge, setKidsAge]           = useState(() => load("yawm_kids_age", "older"));
   const [kidsParent, setKidsParent]     = useState(false);
-  const [kidsPin, setKidsPin]           = useState(() => load("yawm_kids_pin", "1234"));
-  const [kidsPinDraft, setKidsPinDraft] = useState("");
-  const [kidsPinError, setKidsPinError] = useState(false);
+  // eslint-disable-next-line no-unused-vars
+  const [kidsPin, setKidsPin]           = useState("1234"); // kept for backward compat
+  const [kidsPinDraft, setKidsPinDraft] = useState(""); // eslint-disable-line no-unused-vars
+  const [kidsPinError, setKidsPinError] = useState(false); // eslint-disable-line no-unused-vars
   const [kidsEnabledTasks, setKidsEnabledTasks] = useState(() => load("yawm_kids_tasks", ALL_KIDS_TASKS.map(t => t.id)));
   const [adultPoints, setAdultPoints] = useState(() => load("yawm_adult_pts", {}));
   const [kidsPoints, setKidsPoints]     = useState(() => load("yawm_kids_pts", {}));
   const [kidsChecked, setKidsChecked]   = useState(() => load("yawm_kids_" + TODAY_KEY, {}));
   const [confetti, setConfetti]         = useState(false);
   const [kidsTab, setKidsTab]           = useState("deeds");
+  const kidsStreak = (() => {
+    let s = 0, d = new Date(TODAY);
+    for (let i = 0; i < 365; i++) {
+      const k = "yawm_kids_" + dateStr(d);
+      try {
+        const h = JSON.parse(localStorage.getItem(k) || "{}");
+        const fardIds = KIDS_PRAYERS.flatMap(p => p.rows.filter(r=>r.type==="F").map(r=>r.id));
+        if (fardIds.every(id => h[id])) s++;
+        else break;
+      } catch(e) { break; }
+      d = addDays(d, -1);
+    }
+    return s;
+  })();
+  const [adhkarScreen, setAdhkarScreen] = useState("home");   // home | select | count
 
-  const T  = mode === "gamified" ? GAMIFIED_THEME : TH[theme];
+  // ── Masjid / Jamaah state ──────────────────────────────────────────────────
+  const [masjidPrayers, setMasjidPrayers] = useState(() => load("yawm_masjid_" + (new Date().toISOString().slice(0,10)), []));
+  function toggleMasjid(prayerId, fardRowIds) {
+    const isOn = masjidPrayers.includes(prayerId);
+    let next;
+    if (isOn) {
+      next = masjidPrayers.filter(id => id !== prayerId);
+    } else {
+      next = [...masjidPrayers, prayerId];
+      // Auto-tick all fard rows for this prayer via hist
+      const updatedChecked = { ...(hist[TODAY_KEY] || {}) };
+      fardRowIds.forEach(id => { updatedChecked[id] = true; });
+      const h2 = { ...hist, [TODAY_KEY]: updatedChecked };
+      if (mode === "gamified") { setJourneyHist(h2); save("yawm_hist_journey", h2); }
+      else { setClassicHist(h2); save("yawm_hist_classic", h2); }
+      // Bonus points in Journey
+      if (mode === "gamified") {
+        const bonus = fardRowIds.length * 5;
+        setAdultPoints(prev => {
+          const k = TODAY_KEY;
+          const updated = { ...prev, [k]: (prev[k] || 0) + bonus };
+          save("yawm_adult_pts", updated);
+          return updated;
+        });
+      }
+    }
+    setMasjidPrayers(next);
+    save("yawm_masjid_" + TODAY_KEY, next);
+  }
+  const masjidCount = masjidPrayers.length; // eslint-disable-line no-unused-vars
+  const jamaahStreak = (() => {
+    let s = 0, d = new Date(TODAY);
+    for (let i = 0; i < 365; i++) {
+      const k = dateStr(d);
+      const m = load("yawm_masjid_" + k, []);
+      if (m.length > 0) s++; else break;
+      d = addDays(d, -1);
+    }
+    return s;
+  })();
+
+  // ── Muhasaba state ──────────────────────────────────────────────────────────
+  const MH_KEY = "yawm_muhasaba_" + TODAY_KEY;
+  function loadMH() { try { return JSON.parse(localStorage.getItem(MH_KEY) || "null") || {}; } catch(e) { return {}; } }
+  function saveMH(data) { try { localStorage.setItem(MH_KEY, JSON.stringify(data)); } catch(e) {} }
+  const initMH = loadMH();
+  const [mhMood,      setMhMood]      = useState(initMH.mood      || null);
+  const [mhGood,      setMhGood]      = useState(initMH.good      || "");
+  const [mhImprove,   setMhImprove]   = useState(initMH.improve   || "");
+  const [mhGrateful,  setMhGrateful]  = useState(initMH.grateful  || "");
+  const [mhIstighfar, setMhIstighfar] = useState(initMH.istighfar || false);
+  const [mhSaved,     setMhSaved]     = useState(!!initMH.saved);
+  function saveMuhasaba() {
+    const data = { mood:mhMood, good:mhGood, improve:mhImprove, grateful:mhGrateful, istighfar:mhIstighfar, saved:true };
+    saveMH(data);
+    setMhSaved(true);
+  }
+  const [adhkarPrayer, setAdhkarPrayer] = useState(null);
+  const [adhkarSetKey, setAdhkarSetKey] = useState(null);
+
+  const T  = mode === "gamified" ? GAMIFIED_THEME[theme] : TH[theme];
   const SS = theme === "light" ? SEC_STYLE_L : SEC_STYLE_D;
   const KT = KIDS_THEME[kidsAge];
   const GOLD = T.gold;
-  const IS_RAMADAN = hijri.month === 9;
+  const IS_RAMADAN   = hijri.month === 9;
+  const IS_EID_FITR  = hijri.month === 10 && hijri.day === 1;
+  const IS_EID_ADHA  = hijri.month === 12 && hijri.day === 10;
+  const IS_EID       = IS_EID_FITR || IS_EID_ADHA;
+  const EID_NAME     = IS_EID_FITR ? "Eid al-Fitr" : "Eid al-Adha";
+  const EID_AR       = IS_EID_FITR ? "عِيدُ الْفِطْر" : "عِيدُ الْأَضْحَى";
+  const EID_TAKBEER  = IS_EID_FITR
+    ? "اللَّهُ أَكْبَرُ اللَّهُ أَكْبَرُ لَا إِلَهَ إِلَّا اللَّهُ ♥ وَاللَّهُ أَكْبَرُ اللَّهُ أَكْبَرُ وَلِلَّهِ الْحَمْدُ"
+    : "اللَّهُ أَكْبَرُ اللَّهُ أَكْبَرُ اللَّهُ أَكْبَرُ ♥ لَا إِلَهَ إِلَّا اللَّهُ ♥ وَاللَّهُ أَكْبَرُ اللَّهُ أَكْبَرُ وَلِلَّهِ الْحَمْدُ";
 
   // Prayer times state
   const [prayerTimes, setPrayerTimes]   = useState(null);
   const [prayerError, setPrayerError]   = useState(null);
+  const [isOnline,    setIsOnline]      = useState(() => navigator.onLine);
+  useEffect(function() {
+    function handleOnline()  { setIsOnline(true); }
+    function handleOffline() { setIsOnline(false); }
+    window.addEventListener("online",  handleOnline);
+    window.addEventListener("offline", handleOffline);
+    return function() { window.removeEventListener("online",handleOnline); window.removeEventListener("offline",handleOffline); };
+  }, []);
   const [prayerLoading, setPrayerLoading] = useState(false);
   const [calcMethod, setCalcMethod]     = useState(() => load("yawm_calc", 3));   // 3=MWL default
   const [madhab, setMadhab]             = useState(() => load("yawm_madhab", 1)); // 1=Shafi, 0=Hanafi
+  const [notifEnabled, setNotifEnabled] = useState(() => load("yawm_notif", false));
+  const [showShare,    setShowShare]    = useState(false);
+  const [notifOffset,  setNotifOffset]  = useState(() => load("yawm_notif_offset", 0));
+  const [tasbihCount,  setTasbihCount]  = useState(0);
+
+  // ── Garden placement state ────────────────────────────────────────────────
+  const GARDEN_LAYOUT_KEY = "yawm_garden_layout_" + TODAY_KEY;
+  const [gardenLayout, setGardenLayout] = useState(() => load(GARDEN_LAYOUT_KEY, {}));
+  const [pendingItem,  setPendingItem]  = useState(null); // { key, emoji, label } waiting to be placed
+  const [gardenMsg,    setGardenMsg]    = useState(null); // toast message
+
+  function saveGardenLayout(next) {
+    setGardenLayout(next);
+    save(GARDEN_LAYOUT_KEY, next);
+  }
+  function earnGardenItem(key, emoji, label) {
+    // Only earn if not already placed and not already pending
+    if (gardenLayout[key]) return;
+    setPendingItem({ key, emoji, label });
+    setGardenMsg("You earned " + emoji + " " + label + "! Go to your garden to place it 🌱");
+    setTimeout(() => setGardenMsg(null), 3500);
+  }
+  function placeItem(key, emoji, xPct, yPct) {
+    const next = { ...gardenLayout, [key]: { emoji, x: xPct, y: yPct } };
+    saveGardenLayout(next);
+    setPendingItem(null);
+  }
+  function removeItem(key) {
+    const next = { ...gardenLayout };
+    delete next[key];
+    saveGardenLayout(next);
+  }
+
+  // Kids garden placement (separate layout)
+  const KIDS_GARDEN_KEY = "yawm_kids_garden_" + TODAY_KEY;
+  const [kidsGardenLayout, setKidsGardenLayout] = useState(() => load(KIDS_GARDEN_KEY, {}));
+  const [kidsPendingItem,  setKidsPendingItem]  = useState(null);
+  const [kidsGardenMsg,    setKidsGardenMsg]    = useState(null);
+
+  function saveKidsGardenLayout(next) {
+    setKidsGardenLayout(next);
+    save(KIDS_GARDEN_KEY, next);
+  }
+  // eslint-disable-next-line no-unused-vars
+  function earnKidsItem(key, emoji, label) {
+    if (kidsGardenLayout[key]) return;
+    setKidsPendingItem({ key, emoji, label });
+    setKidsGardenMsg("You earned " + emoji + "! Tap your garden to place it!");
+    setTimeout(() => setKidsGardenMsg(null), 3500);
+  }
+  function placeKidsItem(key, emoji, xPct, yPct) {
+    const next = { ...kidsGardenLayout, [key]: { emoji, x: xPct, y: yPct } };
+    saveKidsGardenLayout(next);
+    setKidsPendingItem(null);
+  }
+  const [tasbihTarget, setTasbihTarget] = useState(33);
+  const [tasbihPhrase, setTasbihPhrase] = useState(0); // 0=SubhanAllah,1=Alhamdulillah,2=AllahuAkbar
+  const [tasbihFlash,  setTasbihFlash]  = useState(false);
+  const TASBIH_PHRASES = [
+    { ar:"سُبْحَانَ اللَّهِ",  tr:"SubhanAllah",   en:"Glory be to Allah",         color:"#16a34a" },
+    { ar:"الْحَمْدُ لِلَّهِ", tr:"Alhamdulillah", en:"All praise is due to Allah", color:"#0369a1" },
+    { ar:"اللَّهُ أَكْبَرُ",  tr:"Allahu Akbar",   en:"Allah is the Greatest",     color:GOLD      },
+  ];
+  function tasbihTap() {
+    if (navigator.vibrate) navigator.vibrate(18);
+    playTasbihClick("tap");
+    const next = tasbihCount + 1;
+    setTasbihCount(next);
+    if (next >= tasbihTarget) {
+      setTasbihFlash(true);
+      playTasbihClick("complete");
+      if (navigator.vibrate) navigator.vibrate([60,40,60]);
+      setTimeout(() => {
+        setTasbihFlash(false);
+        setTasbihCount(0);
+        // Auto-advance to next phrase in 33-33-34 sequence
+        if (tasbihTarget === 33 && tasbihPhrase === 0) { setTasbihPhrase(1); }
+        else if (tasbihTarget === 33 && tasbihPhrase === 1) { setTasbihPhrase(2); setTasbihTarget(34); }
+        else { setTasbihPhrase(0); setTasbihTarget(33); }
+      }, 900);
+    }
+  } // mins before prayer
+
+  async function requestNotifications() {
+    if (!("Notification" in window)) { alert("Notifications not supported on this device."); return; }
+    const perm = await Notification.requestPermission();
+    if (perm === "granted") {
+      setNotifEnabled(true);
+      save("yawm_notif", true);
+      scheduleNotifications();
+    } else {
+      setNotifEnabled(false);
+      save("yawm_notif", false);
+    }
+  }
+
+  function disableNotifications() {
+    setNotifEnabled(false);
+    save("yawm_notif", false);
+  }
+
+  function scheduleNotifications() {
+    if (!prayerTimes || !("serviceWorker" in navigator)) return;
+    const PRAYER_MAP = [
+      { id:"fajr",    name:"Fajr",    key:"Fajr",    body:"الفجر · Time for Fajr prayer 🌙" },
+      { id:"dhuhr",   name:"Dhuhr",   key:"Dhuhr",   body:"الظهر · Time for Dhuhr prayer ☀️" },
+      { id:"asr",     name:"Asr",     key:"Asr",     body:"العصر · Time for Asr prayer 🌤️" },
+      { id:"maghrib", name:"Maghrib", key:"Maghrib", body:"المغرب · Time for Maghrib prayer 🌆" },
+      { id:"isha",    name:"Isha",    key:"Isha",    body:"العشاء · Time for Isha prayer 🌃" },
+    ];
+    const prayers = PRAYER_MAP.map(function(p) {
+      const t = prayerTimes[p.key];
+      if (!t) return null;
+      const [h, m] = t.split(":").map(Number);
+      const today = new Date();
+      const pTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), h, m, 0);
+      pTime.setMinutes(pTime.getMinutes() - (notifOffset || 0));
+      return { id:p.id, name:p.name, body:p.body, time:pTime.getTime() };
+    }).filter(Boolean);
+    navigator.serviceWorker.ready.then(function(sw) {
+      sw.active.postMessage({ type:"SCHEDULE_NOTIFICATIONS", prayers });
+    });
+  }
+
+  // Schedule notifications whenever prayer times load
+  useEffect(function() {
+    if (notifEnabled && prayerTimes) scheduleNotifications();
+  }, [prayerTimes, notifEnabled, notifOffset]); // eslint-disable-line
   const [locationName, setLocationName] = useState(null);
   const [now, setNow]                   = useState(new Date());
 
   useEffect(() => { save("yawm_theme", theme); }, [theme]);
+  useEffect(() => { save("yawm_gender", gender); }, [gender]);
+  useEffect(() => { save("yawm_font_scale", fontScale); }, [fontScale]);
   useEffect(() => { save("yawm_mode", mode); }, [mode]);
   useEffect(() => { save("yawm_adult_pts", adultPoints); }, [adultPoints]);
   useEffect(() => { save("yawm_kids_age", kidsAge); }, [kidsAge]);
-  useEffect(() => { save("yawm_kids_pin", kidsPin); }, [kidsPin]);
   useEffect(() => { save("yawm_kids_tasks", kidsEnabledTasks); }, [kidsEnabledTasks]);
   useEffect(() => { save("yawm_kids_pts", kidsPoints); }, [kidsPoints]);
   useEffect(() => { save("yawm_kids_" + TODAY_KEY, kidsChecked); }, [kidsChecked]);
@@ -522,17 +1439,45 @@ export default function App() {
 
   const todayChecked = hist[TODAY_KEY] || {};
 
+  // Deed → garden element mapping for Journey mode
+  const DEED_GARDEN_MAP = {
+    fajr_fard:    { key:"fajr",     emoji:"🌴", label:"Fajr Palm" },
+    dhuhr_fard:   { key:"dhuhr",    emoji:"🌲", label:"Dhuhr Pine" },
+    asr_fard:     { key:"asr",      emoji:"🌳", label:"Asr Oak" },
+    magh_fard:    { key:"maghrib",  emoji:"🎋", label:"Maghrib Bamboo" },
+    isha_fard:    { key:"isha",     emoji:"🌵", label:"Isha Cedar" },
+    witr:         { key:"witr",     emoji:"⭐", label:"Witr Star" },
+    quran_recite: { key:"quran",    emoji:"💧", label:"River of Quran" },
+    duha_pray:    { key:"duha",     emoji:"☀️", label:"Duha Sun" },
+    tahajjud_pray:{ key:"tahajjud", emoji:"🕊️", label:"Tahajjud Dove" },
+    adhkar_morning:{ key:"adhkar",  emoji:"✨", label:"Dhikr Light" },
+    adhkar_evening:{ key:"adhkar",  emoji:"✨", label:"Dhikr Light" },
+    sadaqah_daily:{ key:"sadaqah",  emoji:"⛲", label:"Sadaqah Fountain" },
+    fajr_sun:     { key:"sun_0",    emoji:"🌸", label:"Sunnah Flower" },
+    dhuhr_sunB:   { key:"sun_1",    emoji:"🌺", label:"Sunnah Flower" },
+    dhuhr_sunA:   { key:"sun_2",    emoji:"🌼", label:"Sunnah Flower" },
+    magh_sunA:    { key:"sun_3",    emoji:"🌻", label:"Sunnah Flower" },
+    isha_sunA:    { key:"sun_4",    emoji:"🌹", label:"Sunnah Flower" },
+  };
   function toggle(id) {
     const next = { ...todayChecked, [id]: !todayChecked[id] };
     const h2   = { ...hist, [TODAY_KEY]: next };
     setHist(h2);
     save("yawm_hist", h2);
-    // Save daily points for Journey mode
     if (mode === "gamified") {
       const dayPts = Object.keys(next).filter(k=>next[k]&&DEED_POINTS[k]).reduce((s,k)=>s+(DEED_POINTS[k]||0),0);
       const newPts = { ...adultPoints, [TODAY_KEY]: dayPts };
       setAdultPoints(newPts);
       save("yawm_adult_pts", newPts);
+      // Earn garden item if newly checked
+      if (next[id] && DEED_GARDEN_MAP[id]) {
+        const g = DEED_GARDEN_MAP[id];
+        earnGardenItem(g.key, g.emoji, g.label);
+      }
+      // Remove from garden if unchecked
+      if (!next[id] && DEED_GARDEN_MAP[id]) {
+        removeItem(DEED_GARDEN_MAP[id].key);
+      }
     }
   }
 
@@ -548,7 +1493,22 @@ export default function App() {
     setNotes(n2); save("yawm_notes", n2);
   }
 
-  const allIds = getDayIds(IS_RAMADAN, IS_FRI, IS_FAST, customs);
+  const isFemale = gender === "female";
+  // Females don't have Jumu'ah; on exemption days prayers are not required
+  // Males: Jumu'ah is obligatory. Females: Jumu'ah is optional (show but not required for streak/pct)
+  const effectiveFriday = IS_FRI; // Show Jumuah section for both on Fridays
+  const allIds = [...getDayIds(IS_RAMADAN, effectiveFriday, IS_FAST, customs),
+    ...(IS_EID ? ["eid_prayer"] : []),
+  ].filter(id => {
+    // For females, exclude jumuah from required count (it's optional)
+    if (isFemale && id === "jumuah") return false;
+    // On exemption days, remove all prayer row ids
+    if (isExempt && isFemale) {
+      const prayerRowIds = PRAYERS.flatMap(p => p.rows.map(r => r.id));
+      if (prayerRowIds.includes(id)) return false;
+    }
+    return true;
+  });
   const total  = allIds.length;
   const done   = allIds.filter(id => todayChecked[id]).length;
   const pct    = total ? Math.round((done / total) * 100) : 0;
@@ -623,16 +1583,257 @@ export default function App() {
     .check-pop { animation: popIn 0.22s ease forwards; }
   `;
 
+  // ── Share card renderer ──────────────────────────────────────────────────
+  function ShareCard() {
+    const todayH    = hist[TODAY_KEY] || {};
+    const fardDone  = FARD_IDS.filter(id => todayH[id]).length;
+    const fardTotal = FARD_IDS.length;
+    const dayPct    = fardTotal ? Math.round((fardDone/fardTotal)*100) : 0;
+    const MOOD_MAP  = { excellent:"🌟", good:"😊", okay:"😐", hard:"😔", struggling:"🤲" };
+    const moodIcon  = MOOD_MAP[mhMood] || "";
+    const dateLabel = DAYS_LONG[DOW] + ", " + MON_SHORT[TODAY.getMonth()] + " " + DOM;
+    const hijriLabel= hijri.day + " " + HM_EN[hijri.month-1] + " " + hijri.year + " AH";
+    const BAR_COLOR = dayPct >= 80 ? "#16a34a" : dayPct >= 50 ? GOLD : "#f59e0b";
+
+    const PRAYER_STATUS = PRAYERS.map(p => {
+      const rows  = p.rows.filter(r => r.type === "F");
+      const done  = rows.every(r => todayH[r.id]);
+      return { label:p.label, icon:p.icon, done };
+    });
+
+    return (
+      <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.7)",
+        display:"flex", alignItems:"center", justifyContent:"center",
+        zIndex:1000, padding:20 }}
+        onClick={() => setShowShare(false)}>
+        <div style={{ width:"100%", maxWidth:340, background:"#fdf8f0",
+          borderRadius:24, overflow:"hidden",
+          boxShadow:"0 20px 60px rgba(0,0,0,0.4)" }}
+          onClick={e => e.stopPropagation()}>
+
+          {/* Card header */}
+          <div style={{ background:"linear-gradient(135deg,"+GOLD+",#a05a18)",
+            padding:"20px 20px 16px", textAlign:"center" }}>
+            <div style={{ fontSize:11, color:"rgba(255,255,255,0.7)",
+              fontFamily:"sans-serif", letterSpacing:3, textTransform:"uppercase",
+              marginBottom:4 }}>يَوْم · Yawm</div>
+            <div style={{ fontSize:16, fontFamily:"'Amiri',serif",
+              color:"rgba(255,255,255,0.9)", lineHeight:"2", direction:"rtl",
+              marginBottom:4 }}>
+              بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+            </div>
+            <div style={{ fontSize:13, color:"rgba(255,255,255,0.85)",
+              fontFamily:"sans-serif" }}>{dateLabel}</div>
+            <div style={{ fontSize:11, color:"rgba(255,255,255,0.65)",
+              fontFamily:"sans-serif", marginTop:2 }}>{hijriLabel}</div>
+          </div>
+
+          {/* Completion ring */}
+          <div style={{ padding:"20px 20px 16px", textAlign:"center",
+            background:"#fff" }}>
+            <div style={{ display:"flex", justifyContent:"center",
+              alignItems:"center", gap:16, marginBottom:16 }}>
+              {/* SVG ring */}
+              <div style={{ position:"relative", width:90, height:90 }}>
+                <svg width="90" height="90" style={{ transform:"rotate(-90deg)" }}>
+                  <circle cx="45" cy="45" r="36" fill="none" stroke="#f3f4f6" strokeWidth="7"/>
+                  <circle cx="45" cy="45" r="36" fill="none"
+                    stroke={BAR_COLOR} strokeWidth="7"
+                    strokeDasharray={String(2*Math.PI*36)}
+                    strokeDashoffset={String(2*Math.PI*36*(1-dayPct/100))}
+                    strokeLinecap="round"/>
+                </svg>
+                <div style={{ position:"absolute", inset:0, display:"flex",
+                  flexDirection:"column", alignItems:"center", justifyContent:"center" }}>
+                  <div style={{ fontSize:20, fontWeight:800, color:BAR_COLOR,
+                    fontFamily:"sans-serif", lineHeight:1 }}>{dayPct}%</div>
+                  <div style={{ fontSize:8, color:"#9ca3af", fontFamily:"sans-serif" }}>Fard</div>
+                </div>
+              </div>
+              <div style={{ textAlign:"left" }}>
+                <div style={{ fontSize:13, fontWeight:700, color:"#1f2937",
+                  fontFamily:"'Lora',serif", marginBottom:4 }}>Today's Deeds</div>
+                <div style={{ fontSize:11, color:"#6b7280", fontFamily:"sans-serif",
+                  marginBottom:2 }}>🔥 {streak} day streak</div>
+                {moodIcon && <div style={{ fontSize:11, color:"#6b7280",
+                  fontFamily:"sans-serif" }}>Mood: {moodIcon}</div>}
+              </div>
+            </div>
+
+            {/* Prayer pills */}
+            <div style={{ display:"flex", gap:6, justifyContent:"center",
+              flexWrap:"wrap", marginBottom:16 }}>
+              {PRAYER_STATUS.map(p => (
+                <div key={p.label} style={{ display:"flex", alignItems:"center",
+                  gap:4, padding:"4px 10px", borderRadius:20,
+                  background: p.done ? "#f0fdf4" : "#f9fafb",
+                  border:"1px solid "+(p.done?"#bbf7d0":"#e5e7eb") }}>
+                  <span style={{ fontSize:12 }}>{p.icon}</span>
+                  <span style={{ fontSize:10, fontFamily:"sans-serif",
+                    color:p.done?"#16a34a":"#9ca3af",
+                    fontWeight:p.done?700:400 }}>{p.label}</span>
+                  <span style={{ fontSize:9 }}>{p.done?"✓":"○"}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Ayah */}
+            <div style={{ background:GOLD+"10", borderRadius:10,
+              padding:"10px 14px", marginBottom:16, textAlign:"center",
+              border:"1px solid "+GOLD+"22" }}>
+              <div style={{ fontSize:13, color:GOLD, fontFamily:"'Amiri',serif",
+                direction:"rtl", lineHeight:"2", marginBottom:4 }}>
+                وَمَا تُقَدِّمُوا لِأَنفُسِكُم مِّنْ خَيْرٍ تَجِدُوهُ عِندَ اللَّهِ
+              </div>
+              <div style={{ fontSize:9, color:"#9ca3af", fontFamily:"sans-serif",
+                fontStyle:"italic" }}>
+                "Whatever good you put forward, you will find it with Allah." — 2:110
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div style={{ fontSize:10, color:"#9ca3af", fontFamily:"sans-serif",
+              textAlign:"center" }}>
+              tracked with يَوْم · Yawm
+            </div>
+          </div>
+
+          {/* Action buttons */}
+          <div style={{ padding:"0 20px 20px", background:"#fff",
+            display:"flex", gap:8 }}>
+            <button onClick={async () => {
+              const text = "My daily deeds — " + dateLabel + "\n" +
+                fardDone + "/" + fardTotal + " Fard prayers · " + streak + " day streak 🔥\n" +
+                PRAYER_STATUS.filter(p=>p.done).map(p=>p.icon+" "+p.label).join(" · ") +
+                "\n\nتَقَبَّلَ اللَّهُ مِنَّا\n\nTracked with Yawm يَوْم";
+              if (navigator.share) {
+                try { await navigator.share({ text, title:"My Yawm Daily Deeds" }); }
+                catch(e) {}
+              } else {
+                navigator.clipboard.writeText(text).then(() => alert("Copied to clipboard!"));
+              }
+            }} style={{ flex:2, padding:"11px", background:GOLD, border:"none",
+              borderRadius:12, color:"#fff", cursor:"pointer", fontSize:13,
+              fontWeight:700, fontFamily:"'Lora',serif" }}>
+              Share 📤
+            </button>
+            <button onClick={() => setShowShare(false)} style={{ flex:1,
+              padding:"11px", background:"#f3f4f6", border:"1px solid #e5e7eb",
+              borderRadius:12, color:"#6b7280", cursor:"pointer",
+              fontSize:13, fontFamily:"sans-serif" }}>
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // ── Render ────────────────────────────────────────────────────────────────
+
+  // ── Onboarding ──────────────────────────────────────────────────────────────
+  if (onboardStep !== null) {
+    const STEPS = [
+      {
+        icon:"📋",
+        title:"Track your daily deeds",
+        body:"Tick off your prayers and deeds each day. Your streak grows as you stay consistent.",
+        ar:"وَأَقِيمُوا الصَّلَاةَ",
+        arEn:"Establish prayer — Quran 2:43",
+      },
+      {
+        icon:"📿",
+        title:"Post-prayer Adhkar",
+        body:"After each prayer, tap the Adhkar banner to say SubhanAllah, Alhamdulillah and Ayat al-Kursi with a guided tasbih counter.",
+        ar:"اذْكُرُوا اللَّهَ ذِكْرًا كَثِيرًا",
+        arEn:"Remember Allah much — Quran 33:41",
+      },
+      {
+        icon:"🪞",
+        title:"Reflect each evening",
+        body:"Use the Reflect tab for your daily Muhasaba — check your mood, write what you are grateful for, and make Istighfar.",
+        ar:"حَاسِبُوا أَنْفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا",
+        arEn:'"Take account before you are taken to account" — Umar ibn al-Khattab',
+      },
+    ];
+    const step = STEPS[onboardStep];
+    const isLast = onboardStep === STEPS.length - 1;
+    const OB_BG  = T.bg;
+    const OB_ACC = mode === "gamified" ? "#4f46e5" : GOLD;
+    return (
+      <div style={{ minHeight:"100vh", background:OB_BG, display:"flex", flexDirection:"column",
+        alignItems:"center", justifyContent:"center", padding:"32px 24px", textAlign:"center",
+        fontFamily:"'Lora','Georgia',serif" }}>
+        {/* Progress dots */}
+        <div style={{ display:"flex", gap:8, marginBottom:32 }}>
+          {STEPS.map((_,i) => (
+            <div key={i} style={{ width:i===onboardStep?24:8, height:8, borderRadius:4,
+              background:i<=onboardStep?OB_ACC:T.border, transition:"all 0.3s" }} />
+          ))}
+        </div>
+        {/* Bismillah */}
+        <div style={{ fontSize:14, color:OB_ACC, fontFamily:"'Amiri Quran','Amiri',serif",
+          letterSpacing:2, marginBottom:20 }}>بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+        {/* Icon */}
+        <div style={{ fontSize:64, marginBottom:20 }}>{step.icon}</div>
+        {/* Arabic */}
+        <div style={{ fontSize:18, color:OB_ACC, fontFamily:"'Amiri Quran','Amiri',serif",
+          direction:"rtl", lineHeight:"2.2", marginBottom:6, padding:"0 16px" }}>{step.ar}</div>
+        <div style={{ fontSize:11, color:T.muted, fontFamily:"sans-serif", fontStyle:"italic",
+          marginBottom:24 }}>{step.arEn}</div>
+        {/* Title */}
+        <div style={{ fontSize:22, fontWeight:700, color:T.text, fontFamily:"'Lora',serif",
+          marginBottom:12 }}>{step.title}</div>
+        {/* Body */}
+        <div style={{ fontSize:14, color:T.sub, fontFamily:"sans-serif", lineHeight:"1.8",
+          maxWidth:320, marginBottom:40 }}>{step.body}</div>
+        {/* Button */}
+        <button onClick={() => isLast ? finishOnboard() : setOnboardStep(s=>s+1)} style={{
+          width:"100%", maxWidth:320, padding:"14px", background:OB_ACC, border:"none",
+          borderRadius:14, color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer",
+          fontFamily:"'Lora',serif", marginBottom:12,
+          boxShadow:"0 4px 16px "+OB_ACC+"44",
+        }}>
+          {isLast ? "Begin — بِسْمِ اللَّهِ 🌙" : "Next →"}
+        </button>
+        <button onClick={finishOnboard} style={{ background:"none", border:"none",
+          color:T.muted, fontSize:12, cursor:"pointer", fontFamily:"sans-serif" }}>
+          Skip
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className={"mode-" + mode} style={{ minHeight:"100vh", background:
-        kidsMode ? KT.bg :
-        mode === "gamified" ? (theme === "dark" ? "#0f0e1a" : "#f5f3ff") :
-        T.bg,
+        kidsMode ? KT.bg : T.bg,
       fontFamily: mode === "gamified" ? "'Nunito','Lora',sans-serif" : kidsMode ? "'Fredoka One','Nunito',sans-serif" : "'Lora','Georgia',serif",
-      color:T.text }}>
+      color:T.text,
+      fontSize: fontScale + "rem" }}>
       <style>{css}</style>
 
+      {/* Share card modal */}
+      {showShare && <ShareCard />}
+
+      {/* Garden earned toast */}
+      {gardenMsg && (
+        <div style={{ position:"fixed", top:16, left:"50%", transform:"translateX(-50%)",
+          background:"#1a1a1a", color:"#fff", padding:"10px 18px", borderRadius:20,
+          fontSize:12, fontFamily:"sans-serif", zIndex:999, whiteSpace:"nowrap",
+          boxShadow:"0 4px 16px rgba(0,0,0,0.3)", display:"flex", alignItems:"center", gap:8 }}>
+          <span>🌱</span> {gardenMsg}
+        </div>
+      )}
+      {/* Kids garden earned toast */}
+      {kidsGardenMsg && (
+        <div style={{ position:"fixed", top:16, left:"50%", transform:"translateX(-50%)",
+          background:"linear-gradient(135deg,#f59e0b,#ec4899)",
+          color:"#fff", padding:"10px 18px", borderRadius:20,
+          fontSize:13, fontFamily:"'Fredoka One',sans-serif", zIndex:999,
+          boxShadow:"0 4px 16px rgba(0,0,0,0.2)", textAlign:"center" }}>
+          {kidsGardenMsg}
+        </div>
+      )}
       {/* Note modal */}
       {noteOpen && (
         <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.5)", zIndex:100, display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
@@ -712,59 +1913,63 @@ export default function App() {
         </div>
       )}
 
-      {/* Ramadan banner */}
-      {IS_RAMADAN && !kidsMode && (
+      {/* Offline notice */}
+      {!isOnline && !kidsMode && (
+        <div style={{ textAlign:"center", padding:"7px 16px",
+          background:"#fef3c7", borderBottom:"1px solid #fde68a",
+          fontFamily:"sans-serif", fontSize:11, color:"#92400e",
+          display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
+          <span>📵</span>
+          <span>Offline — showing last known prayer times. Data will sync when connected.</span>
+        </div>
+      )}
+      {/* Eid / Ramadan banner */}
+      {IS_EID && !kidsMode && (
+        <div style={{ textAlign:"center", padding:"12px 16px",
+          background:"linear-gradient(135deg,#fef9c3,#fef3c7)",
+          borderBottom:"1px solid #fde68a", fontFamily:"sans-serif" }}>
+          <div style={{ fontSize:20, marginBottom:2 }}>🌙✨🌙</div>
+          <div style={{ fontSize:16, fontWeight:700, color:"#92400e",
+            fontFamily:"'Lora',serif" }}>
+            {EID_NAME} Mubarak! · {EID_AR}
+          </div>
+          <div style={{ fontSize:11, color:"#a16207", marginTop:2 }}>
+            تَقَبَّلَ اللَّهُ مِنَّا وَمِنْكُمْ — May Allah accept from us and you
+          </div>
+        </div>
+      )}
+      {IS_RAMADAN && !IS_EID && !kidsMode && (
         <div style={{ textAlign:"center", padding:"8px 16px", background:"linear-gradient(135deg,#ea580c22,#f59e0b22)", borderBottom:"1px solid #ea580c33", fontFamily:"sans-serif", fontSize:12, color:"#ea580c" }}>
           🌙 Ramadan Mubarak — Day {hijri.day} · Night {hijri.day + 1 <= 30 ? hijri.day + 1 : "—"}
         </div>
       )}
 
-      <div style={{ maxWidth:480, margin:"0 auto", paddingBottom:56 }}>
-
-        {/* ── Mode switcher ── */}
-        <div style={{ display:"flex", gap:0, margin:"10px 14px 0", borderRadius:14, overflow:"hidden", border:"1px solid " + (kidsMode ? KT.border : mode === "gamified" ? "#6366f1" : T.border) }}>
-          {[
-            { key:"classic",  label:"Classic",  icon:"☪️" },
-            { key:"gamified", label:"Journey",  icon:"⭐" },
-            { key:"kids",     label:"Kids",     icon:"🌱" },
-          ].map(function(m) {
-            const active = mode === m.key;
-            const bg = active
-              ? m.key === "classic"  ? GOLD
-              : m.key === "gamified" ? "#6366f1"
-              : KT.gold
-              : T.alt;
-            return (
-              <button key={m.key} onClick={() => setMode(m.key)} style={{
-                flex:1, padding:"9px 4px", border:"none", cursor:"pointer",
-                background: bg,
-                color: active ? "#fff" : T.muted,
-                fontFamily:"sans-serif", fontSize:11, fontWeight: active ? 700 : 400,
-                transition:"all 0.2s",
-                borderRight: m.key !== "kids" ? "1px solid " + T.border : "none",
-              }}>
-                {m.icon} {m.label}
-              </button>
-            );
-          })}
-        </div>
+      <div style={{ maxWidth:480, margin:"0 auto", paddingBottom:80 }}>
 
         {/* Top bar — hidden in kids mode */}
         {!kidsMode && <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", padding:"12px 16px 0" }}>
-          <div>
+          <div style={{ flex:1, minWidth:0 }}>
             {!hijriEdit ? (
               <div>
-                <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-                  <div style={{ fontSize:16, color:GOLD, fontFamily:"'Amiri',serif", lineHeight:"1.4" }}>
-                    {hijri.day} {HM_AR[hijri.month-1]} {hijri.year} هـ
+                {/* Gregorian date — large */}
+                <div style={{ fontSize:22, fontWeight:700, color:T.text,
+                  fontFamily:"'Lora',serif", lineHeight:"1.1", marginBottom:2 }}>
+                  {DAYS_LONG[DOW]}
+                </div>
+                <div style={{ fontSize:16, color:T.sub, fontFamily:"sans-serif", marginBottom:6 }}>
+                  {MON_SHORT[TODAY.getMonth()]} {DOM}, {TODAY.getFullYear()}
+                </div>
+                {/* Hijri date — both Arabic and English */}
+                <div style={{ display:"flex", alignItems:"center", gap:6, flexWrap:"wrap" }}>
+                  <div style={{ minWidth:0 }}>
+                    <div style={{ fontSize:18, color:GOLD, fontFamily:"'Amiri',serif", lineHeight:"1.3" }}>
+                      {hijri.day} {HM_AR[hijri.month-1]} {hijri.year} هـ
+                    </div>
+                    <div style={{ fontSize:12, color:GOLD, fontFamily:"sans-serif", fontWeight:600, marginTop:1, whiteSpace:"nowrap" }}>
+                      {hijri.day} {HM_EN[hijri.month-1]} {hijri.year} AH
+                    </div>
                   </div>
-                  <button onClick={() => { setHijriDraft({ day:String(hijri.day), month:String(hijri.month), year:String(hijri.year) }); setHijriEdit(true); }} style={{ background:"none", border:"none", cursor:"pointer", fontSize:11, color:T.muted, padding:"0 2px" }} title="Adjust Hijri date">✏️</button>
-                </div>
-                <div style={{ fontSize:9, color:T.muted, letterSpacing:2, textTransform:"uppercase", fontFamily:"sans-serif" }}>
-                  {hijri.day} {HM_EN[hijri.month-1]} {hijri.year} AH
-                </div>
-                <div style={{ fontSize:11, color:T.sub, fontFamily:"sans-serif" }}>
-                  {DAYS_LONG[DOW]}, {MON_SHORT[TODAY.getMonth()]} {DOM} {TODAY.getFullYear()}
+                  <button onClick={() => { setHijriDraft({ day:String(hijri.day), month:String(hijri.month), year:String(hijri.year) }); setHijriEdit(true); }} style={{ background:"none", border:"none", cursor:"pointer", fontSize:12, color:T.muted, padding:"0 2px" }} title="Adjust Hijri date">✏️</button>
                 </div>
               </div>
             ) : (
@@ -868,6 +2073,24 @@ export default function App() {
           {(IS_FRI || IS_FAST) && (
             <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginTop:10 }}>
               {IS_FRI  && <span style={{ background:"#eef2ff", border:"1px solid #c7d2fe", borderRadius:10, padding:"3px 10px", fontSize:11, color:"#4f46e5", fontFamily:"sans-serif" }}>🕌 Jumu'ah</span>}
+              <button onClick={() => setShowShare(true)} style={{
+                background:"none", border:"1px solid " + T.border, borderRadius:10,
+                padding:"3px 10px", fontSize:11, color:GOLD,
+                fontFamily:"sans-serif", cursor:"pointer",
+              }}>📤 Share</button>
+              {done > 0 && (
+                <button onClick={() => {
+                  const h2 = { ...hist, [TODAY_KEY]: {} };
+                  if (mode === "gamified") { setJourneyHist(h2); save("yawm_hist_journey", h2); }
+                  else { setClassicHist(h2); save("yawm_hist_classic", h2); }
+                  setMasjidPrayers([]);
+                  save("yawm_masjid_" + TODAY_KEY, []);
+                }} style={{
+                  background:"none", border:"1px solid " + T.border, borderRadius:10,
+                  padding:"3px 10px", fontSize:11, color:T.muted,
+                  fontFamily:"sans-serif", cursor:"pointer",
+                }}>↺ Uncheck all</button>
+              )}
               {IS_FAST && !IS_RAMADAN && <span style={{ background:"#fefce8", border:"1px solid #fcd34d", borderRadius:10, padding:"3px 10px", fontSize:11, color:"#a16207", fontFamily:"sans-serif" }}>🌿 {IS_WHITE ? "Ayyam al-Bid — " + DOM + "th" : IS_MON ? "Monday Fast" : "Thursday Fast"}</span>}
             </div>
           )}
@@ -875,6 +2098,20 @@ export default function App() {
         )} {/* end !kidsMode hero */}
 
         {/* ══ KIDS MODE ══ */}
+        {IS_EID && kidsMode && (
+          <div style={{ textAlign:"center", padding:"12px 16px",
+            background:"linear-gradient(135deg,#fef9c3,#fef3c7)",
+            marginBottom:8, borderRadius:12, margin:"8px 14px" }}>
+            <div style={{ fontSize:24, marginBottom:2 }}>🌙✨🎉</div>
+            <div style={{ fontSize:16, fontWeight:700, color:"#92400e",
+              fontFamily:"'Fredoka One',sans-serif" }}>
+              {EID_NAME} Mubarak!
+            </div>
+            <div style={{ fontSize:11, color:"#a16207", fontFamily:"sans-serif", marginTop:2 }}>
+              تَقَبَّلَ اللَّهُ مِنَّا وَمِنْكُمْ 🌟
+            </div>
+          </div>
+        )}
         {kidsMode && (
           <div>
             {/* Kids header */}
@@ -905,7 +2142,7 @@ export default function App() {
                     <div style={{ background:"rgba(255,255,255,0.25)", borderRadius:10, height:12, overflow:"hidden", margin:"0 20px" }}>
                       <div style={{ height:"100%", width:pct+"%", background:"#fff", borderRadius:10, transition:"width 0.5s ease" }} />
                     </div>
-                    <div style={{ fontSize:11, color:"rgba(255,255,255,0.7)", fontFamily:"sans-serif", marginTop:4 }}>{todayPts}/{maxPts} points today</div>
+                    <div style={{ fontSize:11, color:"rgba(255,255,255,0.7)", fontFamily:"sans-serif", marginTop:4 }}>{todayPts}/{maxPts} points today · 🔥 {kidsStreak} day streak</div>
                   </div>
                 );
               })()}
@@ -914,7 +2151,7 @@ export default function App() {
             {/* Kids tab bar */}
             <div style={{ display:"flex", margin:"10px 14px 0", borderRadius:14, overflow:"hidden",
               border:"2px solid " + KT.border }}>
-              {[["deeds","📋","Deeds"],["garden","🏡","Garden"]].map(function(t) {
+              {[["deeds","📋","Deeds"],["garden","🏡","Garden"],["learn","📖","Learn"]].map(function(t) {
                 const active = kidsTab === t[0];
                 return (
                   <button key={t[0]} onClick={() => setKidsTab(t[0])} style={{
@@ -937,7 +2174,7 @@ export default function App() {
             <div style={{ padding:"10px 14px 0" }}>
 
               {/* Prayer boxes */}
-              {KIDS_PRAYERS.map(function(prayer) {
+              {kidsAge !== "little" && KIDS_PRAYERS.map(function(prayer) {
                 const visRows = prayer.rows;
                 const pDone = visRows.filter(r => kidsChecked[r.id]).length;
                 const allDone = pDone === visRows.length;
@@ -1044,11 +2281,28 @@ export default function App() {
                   <button key={task.id} onClick={() => {
                     const next = { ...kidsChecked, [task.id]: !kidsChecked[task.id] };
                     setKidsChecked(next);
+                    const KIDS_GARDEN_EARN = {
+                      k_quran:    { emoji:"🌊", label:"Quran River"    },
+                      k_adkhar:   { emoji:"✨", label:"Fireflies"      },
+                      k_dua:      { emoji:"☁️", label:"Dua Cloud"      },
+                      k_sadaqah:  { emoji:"🌻", label:"Sunflower"      },
+                      k_kind:     { emoji:"🕊️", label:"Kindness Dove"  },
+                      k_parents:  { emoji:"🌳", label:"Oak Tree"       },
+                      k_bismillah:{ emoji:"🌟", label:"Star"           },
+                    };
                     if (!chk) {
                       const allPts = [...KIDS_PRAYERS.flatMap(p=>p.rows), ...ALL_KIDS_TASKS].reduce((s,t) => next[t.id] ? s+(t.pts||t.points||0) : s, 0);
                       const newPts = { ...kidsPoints, [TODAY_KEY]: allPts };
                       setKidsPoints(newPts); save("yawm_kids_pts", newPts);
                       setConfetti(true); setTimeout(() => setConfetti(false), 1200);
+                      const g = KIDS_GARDEN_EARN[task.id];
+                      if (g) {
+                        setKidsPendingItem({ key:task.id, emoji:g.emoji, label:g.label });
+                        setKidsGardenMsg("You earned " + g.emoji + " " + g.label + "! Go to garden to place it!");
+                        setTimeout(() => setKidsGardenMsg(null), 3000);
+                      }
+                    } else {
+                      const nk = { ...kidsGardenLayout }; delete nk[task.id]; saveKidsGardenLayout(nk);
                     }
                   }} style={{
                     display:"flex", alignItems:"center", gap:12,
@@ -1088,7 +2342,8 @@ export default function App() {
               )}
 
               {/* All done celebration */}
-              {ALL_KIDS_TASKS.filter(t => kidsEnabledTasks.includes(t.id)).every(t => kidsChecked[t.id]) && (
+              {ALL_KIDS_TASKS.filter(t => kidsEnabledTasks.includes(t.id)).every(t => kidsChecked[t.id]) &&
+               KIDS_PRAYERS.flatMap(p=>p.rows.filter(r=>r.type==="F")).every(r => kidsChecked[r.id]) && (
                 <div style={{ padding:"16px", background:"linear-gradient(135deg,#ff9800,#e91e63)", borderRadius:16, textAlign:"center", marginBottom:12, color:"#fff" }}>
                   <div style={{ fontSize:32, marginBottom:4 }}>🎉</div>
                   <div style={{ fontSize:16, fontWeight:700, fontFamily:"'Lora',serif" }}>الحمد لله! All done!</div>
@@ -1096,107 +2351,399 @@ export default function App() {
                 </div>
               )}
 
-                            {/* Parent settings button */}
-              <button onClick={() => { setKidsPinDraft(""); setKidsParent(true); }} style={{ width:"100%", padding:"10px", background:KT.alt, border:"2px dashed " + KT.border, borderRadius:12, cursor:"pointer", color:KT.muted, fontSize:13, fontFamily:"sans-serif", marginBottom:10 }}>
-                🔒 Parent Settings
-              </button>
+              
             </div>
             )} {/* end deeds tab */}
 
             {/* Kids garden tab */}
             {kidsTab === "garden" && (
             <div style={{ padding:"10px 14px 0" }}>
-              {/* Kids Garden — House in Jannah */}
-              <div style={{ marginBottom:12, borderRadius:20, overflow:"hidden",
-                border:"3px solid " + KT.border,
-                background:"linear-gradient(180deg,#bfdbfe 0%,#93c5fd 30%,#86efac 60%,#4ade80 100%)" }}>
-                {/* Garden header */}
-                <div style={{ padding:"10px 14px 8px",
-                  background: KT.headerBg, textAlign:"center" }}>
-                  <div style={{ fontSize:11, fontWeight:800, color:"#fff",
-                    fontFamily:"'Fredoka One',sans-serif", letterSpacing:1 }}>
-                    🏡 MY HOUSE IN JANNAH
-                  </div>
-                </div>
-                {/* Visual house scene */}
-                {(() => {
-                  const allK = { ...kidsChecked };
-                  const prayersDone  = KIDS_PRAYERS.flatMap(p=>p.rows.filter(r=>r.type==="F")).filter(r=>allK[r.id]).length;
-                  const sunnahDone   = KIDS_PRAYERS.flatMap(p=>p.rows.filter(r=>r.type==="S")).filter(r=>allK[r.id]).length;
-                  const witrDone     = allK["kp_witr"];
-                  const quranDone    = allK["k_quran"];
-                  const kindDone     = allK["k_kind"];
-                  const parentsDone  = allK["k_parents"];
-                  const sadaqahDone  = allK["k_sadaqah"];
-                  const dhikrDone    = allK["k_adkhar"] || allK["k_bismillah"];
-                  // House parts unlock as prayers done
-                  const BRICKS   = Math.min(prayersDone, 5);
-                  const HAS_ROOF = prayersDone >= 3;
-                  const HAS_DOOR = prayersDone >= 2;
-                  // HAS_WIN used to show windows (prayersDone >= 4 shows 🏡 which includes windows)
-                  const HAS_GARDEN = sunnahDone >= 2;
-                  const HAS_TREE = sunnahDone >= 4;
-                  const HAS_STAR = witrDone;
-                  const HAS_RIVER = quranDone;
-                  const HAS_RAINBOW = kindDone && parentsDone;
-                  const HAS_FOUNTAIN = sadaqahDone;
-                  const HAS_LIGHT  = dhikrDone;
-                  const DONE_ALL = prayersDone >= 5;
-                  return (
-                    <div style={{ minHeight:200, position:"relative", padding:"8px 10px 4px" }}>
-                      {/* Sky */}
-                      <div style={{ position:"absolute", top:0, left:0, right:0, height:"50%",
-                        background:"linear-gradient(180deg,#bfdbfe,#dbeafe)" }} />
-                      <div style={{ position:"absolute", bottom:0, left:0, right:0, height:"50%",
-                        background:"linear-gradient(180deg,#86efac,#4ade80)" }} />
-                      {/* Sun */}
-                      <div style={{ position:"absolute", top:8, right:16, fontSize:26 }}>☀️</div>
-                      {/* Rainbow */}
-                      {HAS_RAINBOW && <div style={{ position:"absolute", top:6, left:10, fontSize:22 }}>🌈</div>}
-                      {/* Stars */}
-                      {HAS_STAR && <div style={{ position:"absolute", top:12, left:"35%", fontSize:14 }}>⭐⭐⭐</div>}
-                      {/* Light glow */}
-                      {HAS_LIGHT && <div style={{ position:"absolute", top:8, left:"55%", fontSize:16 }}>✨</div>}
-                      {/* River */}
-                      {HAS_RIVER && <div style={{ position:"absolute", bottom:"22%", left:0, right:0, height:14,
-                        background:"linear-gradient(90deg,#93c5fd88,#60a5fa,#93c5fd88)",
-                        borderRadius:7, margin:"0 20px" }} />}
-                      {/* Fountain */}
-                      {HAS_FOUNTAIN && <div style={{ position:"absolute", bottom:"28%", right:"12%", fontSize:20 }}>⛲</div>}
-                      {/* Tree */}
-                      {HAS_TREE && <div style={{ position:"absolute", bottom:"28%", left:"8%", fontSize:26 }}>🌳</div>}
-                      {/* Flowers */}
-                      {HAS_GARDEN && <div style={{ position:"absolute", bottom:"12%", left:0, right:0,
-                        display:"flex", justifyContent:"space-around", padding:"0 10px" }}>
-                        {["🌸","🌺","🌼","🌻","🌹"].slice(0, sunnahDone).map((f,i)=>(
-                          <span key={i} style={{ fontSize:16 }}>{f}</span>
-                        ))}
-                      </div>}
-                      {/* House */}
-                      <div style={{ position:"absolute", bottom:"20%", left:"50%", transform:"translateX(-50%)",
-                        textAlign:"center" }}>
-                        {DONE_ALL
-                          ? <div style={{ fontSize:52 }}>🏡</div>
-                          : HAS_ROOF
-                          ? <div style={{ fontSize:44 }}>🏠</div>
-                          : HAS_DOOR
-                          ? <div style={{ fontSize:36 }}>🧱</div>
-                          : <div style={{ fontSize:28, opacity:0.5 }}>🪨</div>}
-                        {DONE_ALL && (
-                          <div style={{ fontSize:9, fontWeight:800, color:"#166534",
+
+              {/* ── Under 7: Stepping Stones to Jannah ── */}
+              {kidsAge === "little" && (() => {
+                const STONES = [
+                  { id:"k_bismillah", label:"Bismillah",    emoji:"💬", color:"#f59e0b", lit_emoji:"✨" },
+                  { id:"k_dua",       label:"Made Dua",     emoji:"🤲", color:"#a855f7", lit_emoji:"💜" },
+                  { id:"k_adkhar",    label:"Said Adhkar",  emoji:"📿", color:"#8b5cf6", lit_emoji:"💫" },
+                  { id:"k_kind",      label:"Was Kind",     emoji:"💛", color:"#ec4899", lit_emoji:"💛" },
+                  { id:"k_parents",   label:"Helped Parents",emoji:"👪",color:"#f97316", lit_emoji:"🧡" },
+                  { id:"k_sadaqah",   label:"Gave Sadaqah", emoji:"🤝", color:"#16a34a", lit_emoji:"💚" },
+                  { id:"k_quran",     label:"Read Quran",   emoji:"📖", color:"#dc2626", lit_emoji:"❤️" },
+                ];
+                const litCount = STONES.filter(s => kidsChecked[s.id]).length;
+                const allLit   = litCount === STONES.length;
+
+                // Winding path positions (S-curve across canvas)
+                const positions = [
+                  { x:15,  y:78 },
+                  { x:30,  y:58 },
+                  { x:50,  y:48 },
+                  { x:68,  y:55 },
+                  { x:82,  y:40 },
+                  { x:68,  y:25 },
+                  { x:50,  y:15 },
+                ];
+
+                return (
+                  <div>
+                    <div style={{ background:"linear-gradient(180deg,#fef9c3 0%,#bfdbfe 40%,#86efac 100%)",
+                      borderRadius:20, border:"3px solid "+KT.border, overflow:"hidden", marginBottom:12 }}>
+
+                      {/* Header */}
+                      <div style={{ padding:"10px 14px 8px", background:KT.headerBg, textAlign:"center" }}>
+                        <div style={{ fontSize:11, fontWeight:800, color:"#fff",
+                          fontFamily:"'Fredoka One',sans-serif", letterSpacing:1 }}>
+                          🌟 MY PATH TO JANNAH
+                        </div>
+                      </div>
+
+                      {/* SVG path scene */}
+                      <div style={{ position:"relative", height:220 }}>
+                        <svg width="100%" height="220" viewBox="0 0 100 100"
+                          preserveAspectRatio="none" style={{ position:"absolute", inset:0 }}>
+                          {/* Sky gradient */}
+                          <defs>
+                            <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor="#fef9c3"/>
+                              <stop offset="50%" stopColor="#bfdbfe"/>
+                              <stop offset="100%" stopColor="#86efac"/>
+                            </linearGradient>
+                          </defs>
+                          <rect width="100" height="100" fill="url(#skyG)"/>
+                          {/* Path line — winding */}
+                          <polyline
+                            points={positions.map(p=>`${p.x},${p.y}`).join(" ")}
+                            fill="none" stroke="#fff" strokeWidth="3.5"
+                            strokeLinecap="round" strokeLinejoin="round" opacity="0.6"/>
+                          <polyline
+                            points={positions.map(p=>`${p.x},${p.y}`).join(" ")}
+                            fill="none" stroke="#fbbf24" strokeWidth="1.5"
+                            strokeLinecap="round" strokeLinejoin="round"
+                            strokeDasharray="2,3" opacity="0.8"/>
+                        </svg>
+
+                        {/* Sun */}
+                        <div style={{ position:"absolute", top:6, right:10, fontSize:22 }}>☀️</div>
+                        {/* Clouds */}
+                        <div style={{ position:"absolute", top:4, left:"20%", fontSize:14, opacity:0.7 }}>☁️</div>
+                        <div style={{ position:"absolute", top:8, left:"55%", fontSize:11, opacity:0.6 }}>☁️</div>
+
+                        {/* Gate at top */}
+                        <div style={{ position:"absolute", top:"-2%", left:"42%",
+                          textAlign:"center", transition:"all 0.4s" }}>
+                          <div style={{ fontSize: allLit ? 38 : 28,
+                            filter: allLit ? "drop-shadow(0 0 8px #fbbf24)" : "grayscale(0.6)",
+                            transition:"all 0.5s" }}>
+                            {allLit ? "✨🌟✨" : "🌟"}
+                          </div>
+                          <div style={{ fontSize:7, fontWeight:800, color:"#92400e",
                             fontFamily:"'Fredoka One',sans-serif", background:"#fff8",
-                            padding:"1px 6px", borderRadius:6 }}>Your Jannah Home!</div>
+                            padding:"1px 4px", borderRadius:4, whiteSpace:"nowrap",
+                            marginTop:2 }}>
+                            {allLit ? "Jannah Gate! 🎉" : "Jannah Gate"}
+                          </div>
+                        </div>
+
+                        {/* Stepping stones */}
+                        {STONES.map((stone, i) => {
+                          const pos = positions[i];
+                          const lit = !!kidsChecked[stone.id];
+                          return (
+                            <div key={stone.id} style={{
+                              position:"absolute",
+                              left: pos.x + "%",
+                              top:  pos.y + "%",
+                              transform:"translate(-50%,-50%)",
+                              transition:"all 0.3s",
+                            }}>
+                              {/* Stone circle */}
+                              <div style={{
+                                width:36, height:36, borderRadius:"50%",
+                                background: lit
+                                  ? `radial-gradient(circle, ${stone.color}ff, ${stone.color}88)`
+                                  : "rgba(255,255,255,0.6)",
+                                border: `3px solid ${lit ? stone.color : "rgba(255,255,255,0.8)"}`,
+                                display:"flex", alignItems:"center", justifyContent:"center",
+                                fontSize:16,
+                                boxShadow: lit ? `0 0 12px ${stone.color}99` : "0 2px 6px rgba(0,0,0,0.1)",
+                                transition:"all 0.35s ease",
+                                transform: lit ? "scale(1.15)" : "scale(1)",
+                              }}>
+                                {lit ? stone.lit_emoji : stone.emoji}
+                              </div>
+                              {/* Label */}
+                              <div style={{
+                                position:"absolute", top:"100%", left:"50%",
+                                transform:"translateX(-50%)",
+                                fontSize:7, fontWeight:800,
+                                color: lit ? stone.color : "#6b7280",
+                                fontFamily:"'Fredoka One',sans-serif",
+                                whiteSpace:"nowrap", marginTop:2,
+                                background:"rgba(255,255,255,0.85)",
+                                padding:"1px 4px", borderRadius:4,
+                              }}>{stone.label}</div>
+                            </div>
+                          );
+                        })}
+
+                        {/* All lit celebration overlay */}
+                        {allLit && (
+                          <div style={{ position:"absolute", inset:0,
+                            background:"radial-gradient(ellipse at 50% 20%,#fef08a55,transparent 60%)",
+                            pointerEvents:"none" }} />
                         )}
                       </div>
-                      {/* Brick progress */}
-                      <div style={{ position:"absolute", top:8, left:12,
-                        display:"flex", gap:3 }}>
-                        {Array.from({length:5}).map((_,i) => (
-                          <span key={i} style={{ fontSize:14, opacity: i < BRICKS ? 1 : 0.2 }}>🧱</span>
+
+                      {/* Progress bar + message */}
+                      <div style={{ padding:"10px 14px 12px", background:"rgba(255,255,255,0.8)" }}>
+                        <div style={{ display:"flex", justifyContent:"space-between",
+                          alignItems:"center", marginBottom:6 }}>
+                          <div style={{ fontSize:12, fontWeight:700, color:"#92400e",
+                            fontFamily:"'Fredoka One',sans-serif" }}>
+                            {litCount === 0 ? "Start your journey! 🌟"
+                              : allLit ? "You reached Jannah Gate! 🎉 الحمد لله"
+                              : `${litCount} of ${STONES.length} steps lit up! Keep going! ✨`}
+                          </div>
+                          <div style={{ fontSize:12, fontWeight:800, color:KT.gold,
+                            fontFamily:"'Fredoka One',sans-serif" }}>
+                            {litCount}/{STONES.length}
+                          </div>
+                        </div>
+                        <div style={{ height:10, background:"#e5e7eb", borderRadius:5, overflow:"hidden" }}>
+                          <div style={{ height:"100%", borderRadius:5,
+                            background:`linear-gradient(to right,#f59e0b,#ec4899,#a855f7)`,
+                            width:(litCount/STONES.length*100)+"%",
+                            transition:"width 0.5s ease",
+                            boxShadow:"0 0 6px #f59e0b66" }} />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Stone legend */}
+                    <div style={{ background:KT.card, borderRadius:14, border:"2px solid "+KT.border,
+                      padding:"10px 12px" }}>
+                      <div style={{ fontSize:9, color:KT.gold, fontFamily:"sans-serif",
+                        letterSpacing:2, textTransform:"uppercase", fontWeight:700, marginBottom:8 }}>
+                        Each deed lights a stone 🌟
+                      </div>
+                      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:5 }}>
+                        {[
+                          { emoji:"💬", label:"Bismillah", color:"#f59e0b" },
+                          { emoji:"🤲", label:"Make Dua",  color:"#a855f7" },
+                          { emoji:"📿", label:"Adhkar",    color:"#8b5cf6" },
+                          { emoji:"💛", label:"Be Kind",   color:"#ec4899" },
+                          { emoji:"👪", label:"Help Parents",color:"#f97316"},
+                          { emoji:"🤝", label:"Sadaqah",   color:"#16a34a" },
+                          { emoji:"📖", label:"Read Quran",color:"#dc2626" },
+                        ].map(s => (
+                          <div key={s.label} style={{ display:"flex", alignItems:"center", gap:5,
+                            padding:"4px 0" }}>
+                            <span style={{ fontSize:14 }}>{s.emoji}</span>
+                            <span style={{ fontSize:10, color:kidsChecked[ALL_KIDS_TASKS.find(t=>t.emoji===s.emoji)?.id]?s.color:KT.muted,
+                              fontFamily:"'Fredoka One',sans-serif",
+                              fontWeight:kidsChecked[ALL_KIDS_TASKS.find(t=>t.emoji===s.emoji)?.id]?700:400 }}>
+                              {s.label}
+                            </span>
+                            {kidsChecked[ALL_KIDS_TASKS.find(t=>t.emoji===s.emoji)?.id] &&
+                              <span style={{ fontSize:10 }}>✓</span>}
+                          </div>
                         ))}
                       </div>
-                      {/* Empty state */}
-                      {prayersDone === 0 && (
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* ── Ages 7-12: House in Jannah ── */}
+              {kidsAge !== "little" && (() => {
+                const allK = { ...kidsChecked };
+                const prayersDone  = KIDS_PRAYERS.flatMap(p=>p.rows.filter(r=>r.type==="F")).filter(r=>allK[r.id]).length;
+                const sunnahDone   = KIDS_PRAYERS.flatMap(p=>p.rows.filter(r=>r.type==="S")).filter(r=>allK[r.id]).length;
+                const witrDone     = allK["kp_witr"];
+                const quranDone    = allK["k_quran"];
+                const kindDone     = allK["k_kind"];
+                const parentsDone  = allK["k_parents"];
+                const sadaqahDone  = allK["k_sadaqah"];
+                const dhikrDone    = allK["k_adkhar"] || allK["k_bismillah"];
+                const BRICKS   = Math.min(prayersDone, 5);
+                const HAS_ROOF = prayersDone >= 3;
+                const HAS_DOOR = prayersDone >= 2;
+                const HAS_STAR = witrDone;
+                const HAS_RIVER = quranDone;
+                const HAS_KINDNESS = kindDone && parentsDone;
+                const HAS_FOUNTAIN = sadaqahDone;
+                const HAS_LIGHT  = dhikrDone;
+                const DONE_ALL = prayersDone >= 5;
+                // 4 varied tree types, scattered positions — grow from sunnah count
+                const KIDS_TREES = [
+                  { emoji:"🌴", left:"6%",  bottom:"30%", size:30 },
+                  { emoji:"🌲", left:"80%", bottom:"28%", size:26 },
+                  { emoji:"🌳", left:"18%", bottom:"33%", size:28 },
+                  { emoji:"🎋", left:"70%", bottom:"32%", size:22 },
+                ];
+                return (
+                  <div style={{ marginBottom:12, borderRadius:20, overflow:"hidden",
+                    border:"3px solid " + KT.border }}>
+                    <div style={{ padding:"10px 14px 8px", background: KT.headerBg, textAlign:"center" }}>
+                      <div style={{ fontSize:11, fontWeight:800, color:"#fff",
+                        fontFamily:"'Fredoka One',sans-serif", letterSpacing:1 }}>
+                        🏡 MY HOUSE IN JANNAH
+                      </div>
+                    </div>
+                    {/* Unplaced kids items */}
+                    {(() => {
+                      const KIDS_GARDEN_MAP = {
+                        k_quran:"🌊", k_adkhar:"✨", k_dua:"☁️",
+                        k_sadaqah:"🌻", k_kind:"🕊️", k_parents:"🌳", k_bismillah:"🌟",
+                      };
+                      const unplacedKids = ALL_KIDS_TASKS.filter(t=>kidsChecked[t.id] && !kidsGardenLayout[t.id] && t.id!=="k_quran");
+                      const quranPlaced  = !!kidsGardenLayout["k_quran"];
+                      const quranEarned  = !!kidsChecked["k_quran"] && !quranPlaced;
+                      const showPanel    = unplacedKids.length > 0 || quranEarned;
+                      if (!showPanel) return null;
+                      return (
+                        <div style={{ padding:"8px 12px", background:"rgba(255,255,255,0.92)",
+                          display:"flex", alignItems:"center", gap:8, flexWrap:"wrap",
+                          borderBottom:"1px solid "+KT.border }}>
+                          <span style={{ fontSize:10, color:KT.gold,
+                            fontFamily:"'Fredoka One',sans-serif", fontWeight:700 }}>
+                            🌱 Tap to place:
+                          </span>
+                          {quranEarned && (
+                            <button onClick={() => setKidsPendingItem({ key:"k_quran", emoji:"🌊", label:"Quran River" })}
+                              style={{ fontSize:22, background:kidsPendingItem?.key==="k_quran"?"#fef3c7":"transparent",
+                                border:"2px solid "+(kidsPendingItem?.key==="k_quran"?KT.gold:"transparent"),
+                                borderRadius:8, padding:"2px 6px", cursor:"pointer",
+                                transform:kidsPendingItem?.key==="k_quran"?"scale(1.25)":"scale(1)",
+                                transition:"all 0.18s" }}>🌊
+                            </button>
+                          )}
+                          {unplacedKids.map(task => {
+                            const em = KIDS_GARDEN_MAP[task.id] || "✨";
+                            const isPend = kidsPendingItem?.key===task.id;
+                            return (
+                              <button key={task.id}
+                                onClick={() => setKidsPendingItem({ key:task.id, emoji:em, label:task.label })}
+                                style={{ fontSize:22, background:isPend?"#fef3c7":"transparent",
+                                  border:"2px solid "+(isPend?KT.gold:"transparent"),
+                                  borderRadius:8, padding:"2px 6px", cursor:"pointer",
+                                  transform:isPend?"scale(1.25)":"scale(1)",
+                                  transition:"all 0.18s" }}>
+                                {em}
+                              </button>
+                            );
+                          })}
+                          {kidsPendingItem && (
+                            <span style={{ fontSize:9, color:KT.gold, fontFamily:"sans-serif",
+                              fontStyle:"italic" }}>tap garden ↓</span>
+                          )}
+                        </div>
+                      );
+                    })()}
+                    <div
+                      onClick={function(e) {
+                        if (!kidsPendingItem) return;
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const xPct = Math.round(((e.clientX-rect.left)/rect.width)*100);
+                        const yPct = Math.round(((e.clientY-rect.top)/rect.height)*100);
+                        placeKidsItem(kidsPendingItem.key, kidsPendingItem.emoji,
+                          Math.min(Math.max(xPct,8),92)+"%",
+                          Math.min(Math.max(yPct,8),85)+"%");
+                      }}
+                      style={{ minHeight:220, position:"relative",
+                        cursor: kidsPendingItem && kidsTab==="garden" ? "crosshair" : "default",
+                        border: kidsPendingItem && kidsTab==="garden" ? "2px solid "+KT.gold : "2px solid transparent",
+                      }}>
+                      {/* Sky */}
+                      <div style={{ position:"absolute", top:0, left:0, right:0, height:"52%",
+                        background:"linear-gradient(180deg,#bfdbfe,#dbeafe)" }} />
+                      {/* Horizon blend */}
+                      <div style={{ position:"absolute", top:"48%", left:0, right:0, height:"8%",
+                        background:"linear-gradient(180deg,#dbeafe,#bbf7d0)" }} />
+                      {/* Ground — greener with more prayers */}
+                      <div style={{ position:"absolute", bottom:0, left:0, right:0, height:"44%",
+                        background: prayersDone >= 3
+                          ? "linear-gradient(180deg,#86efac,#4ade80)"
+                          : "linear-gradient(180deg,#bbf7d0,#86efac)" }} />
+                      {/* Sun always shown */}
+                      <div style={{ position:"absolute", top:8, right:14, fontSize:26 }}>☀️</div>
+                      {/* Witr → single star */}
+                      {HAS_STAR && <div style={{ position:"absolute", top:8, left:14, fontSize:20 }}>⭐</div>}
+                      {/* Dhikr → sparkle */}
+                      {HAS_LIGHT && <div style={{ position:"absolute", top:10, left:"42%", fontSize:16 }}>✨</div>}
+                      {/* Kindness → doves */}
+                      {HAS_KINDNESS && <>
+                        <div style={{ position:"absolute", top:14, left:"24%", fontSize:15 }}>🕊️</div>
+                        <div style={{ position:"absolute", top:9,  left:"36%", fontSize:12 }}>🕊️</div>
+                      </>}
+                      {/* River */}
+                      {HAS_RIVER && <div style={{ position:"absolute", bottom:"24%", left:0, right:0, height:12,
+                        background:"linear-gradient(90deg,#93c5fd66,#60a5fa,#93c5fd66)",
+                        borderRadius:6, margin:"0 16px" }} />}
+                      {/* Fountain */}
+                      {HAS_FOUNTAIN && <div style={{ position:"absolute", bottom:"29%", right:"8%", fontSize:22 }}>⛲</div>}
+                      {/* Quran river — rendered as strip */}
+                      {kidsGardenLayout["k_quran"] && (
+                        <div style={{ position:"absolute", bottom:"26%", left:0, right:0, height:13,
+                          background:"linear-gradient(90deg,#93c5fd66,#60a5fa,#93c5fd66)",
+                          borderRadius:6, margin:"0 14px" }} />
+                      )}
+                      {/* Placed deed items — sized by type */}
+                      {Object.entries(kidsGardenLayout).map(([key, item]) => {
+                        if (!item || key==="k_quran") return null;
+                        const SIZES = { k_parents:34, k_sadaqah:26, k_kind:20,
+                          k_adkhar:16, k_dua:24, k_bismillah:22 };
+                        const sz = SIZES[key] || 22;
+                        return (
+                          <div key={key} style={{
+                            position:"absolute", left:item.x, top:item.y,
+                            transform:"translate(-50%,-50%)",
+                            fontSize:sz, lineHeight:1,
+                            filter:"drop-shadow(0 2px 5px rgba(0,0,0,0.15))",
+                            transition:"all 0.35s ease",
+                          }}>{item.emoji}</div>
+                        );
+                      })}
+                      {/* Varied trees from sunnah (non-interactive, auto-placed) */}
+                      {KIDS_TREES.slice(0, Math.min(sunnahDone, 4)).map((t,i) => (
+                        <div key={i} style={{ position:"absolute", bottom:t.bottom,
+                          left:t.left, fontSize:t.size }}>{t.emoji}</div>
+                      ))}
+                      {/* House */}
+                      <div style={{ position:"absolute", bottom:"22%", left:"50%",
+                        transform:"translateX(-50%)", textAlign:"center" }}>
+                        {DONE_ALL
+                          ? <><div style={{ fontSize:52 }}>🏡</div>
+                            <div style={{ fontSize:9, fontWeight:800, color:"#166534",
+                              fontFamily:"'Fredoka One',sans-serif",
+                              background:"rgba(255,255,255,0.85)", padding:"1px 6px",
+                              borderRadius:6, marginTop:2 }}>Your Jannah Home!</div></>
+                          : HAS_ROOF ? <div style={{ fontSize:46 }}>🏠</div>
+                          : HAS_DOOR ? <div style={{ fontSize:38 }}>🧱</div>
+                          : <div style={{ fontSize:30, opacity:0.45 }}>🪨</div>}
+                      </div>
+                      {/* Brick progress — centred top */}
+                      <div style={{ position:"absolute", top:8, left:"50%",
+                        transform:"translateX(-50%)", display:"flex", gap:4 }}>
+                        {Array.from({length:5}).map((_,i) => (
+                          <span key={i} style={{ fontSize:15,
+                            opacity:i<BRICKS?1:0.18,
+                            filter:i<BRICKS?"none":"grayscale(1)" }}>🧱</span>
+                        ))}
+                      </div>
+                      {/* Placing hint */}
+                      {kidsPendingItem && kidsTab==="garden" && (
+                        <div style={{ position:"absolute", inset:0, display:"flex",
+                          alignItems:"flex-end", justifyContent:"center",
+                          paddingBottom:10, pointerEvents:"none" }}>
+                          <div style={{ background:"rgba(0,0,0,0.55)", borderRadius:20,
+                            padding:"6px 14px", fontSize:12, color:"#fff",
+                            fontFamily:"'Fredoka One',sans-serif" }}>
+                            Tap to plant {kidsPendingItem.emoji}!
+                          </div>
+                        </div>
+                      )}
+                      {prayersDone === 0 && kidsAge!=="little" && Object.keys(kidsGardenLayout).length===0 && (
                         <div style={{ position:"absolute", inset:0, display:"flex",
                           flexDirection:"column", alignItems:"center", justifyContent:"center",
                           textAlign:"center", padding:16 }}>
@@ -1208,49 +2755,92 @@ export default function App() {
                         </div>
                       )}
                     </div>
-                  );
-                })()}
-                {/* Mini legend */}
-                <div style={{ padding:"8px 12px", background:"rgba(255,255,255,0.7)",
-                  display:"flex", flexWrap:"wrap", gap:6 }}>
-                  {[
-                    { icon:"🏠", label:"Prayers build your house" },
-                    { icon:"🌸", label:"Sunnah = flowers" },
-                    { icon:"⭐", label:"Witr = stars" },
-                    { icon:"💧", label:"Quran = river" },
-                    { icon:"🌈", label:"Kindness = rainbow" },
-                  ].map(item => (
-                    <div key={item.label} style={{ display:"flex", alignItems:"center", gap:4,
-                      fontSize:10, color:"#166534", fontFamily:"'Nunito',sans-serif", fontWeight:600 }}>
-                      <span>{item.icon}</span><span>{item.label}</span>
+                    <div style={{ padding:"8px 12px", background:"rgba(255,255,255,0.8)",
+                      display:"flex", flexWrap:"wrap", gap:6 }}>
+                      {[
+                        { icon:"🏠", label:"Prayers = house" },
+                        { icon:"🌴", label:"Sunnah = trees & flowers" },
+                        { icon:"🌊", label:"Quran = river" },
+                        { icon:"🌳", label:"Help Parents = oak" },
+                        { icon:"🌻", label:"Sadaqah = sunflower" },
+                        { icon:"🕊️", label:"Kindness = dove" },
+                        { icon:"☁️", label:"Dua = cloud" },
+                        { icon:"✨", label:"Adhkar = fireflies" },
+                        { icon:"🌟", label:"Bismillah = star" },
+                      ].map(item => (
+                        <div key={item.label} style={{ display:"flex", alignItems:"center", gap:3,
+                          fontSize:10, color:"#166534", fontFamily:"'Nunito',sans-serif", fontWeight:600 }}>
+                          <span>{item.icon}</span><span>{item.label}</span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </div>
+                  </div>
+                );
+              })()}
 
-              <button onClick={() => { setKidsPinDraft(""); setKidsParent(true); }} style={{ width:"100%", padding:"10px", background:KT.alt, border:"2px dashed " + KT.border, borderRadius:12, cursor:"pointer", color:KT.muted, fontSize:13, fontFamily:"sans-serif", marginBottom:10 }}>
-                🔒 Parent Settings
-              </button>
             </div>
             )} {/* end garden tab */}
 
-            {/* Parent PIN modal */}
+            {/* Kids learn tab */}
+            {kidsTab === "learn" && (() => {
+              const KIDS_FACTS = [
+                { emoji:"☪️", title:"Why do we pray?",    body:"Allah loves us and wants us to talk to Him 5 times a day. Prayer is like a phone call to Allah! 📞", ar:"وَأَقِيمُوا الصَّلَاةَ", src:"Quran 2:43" },
+                { emoji:"📿", title:"What is Dhikr?",     body:"Dhikr means remembering Allah. When we say SubhanAllah, Alhamdulillah, or Allahu Akbar — that is dhikr! Angels write it down. 📝", ar:"اذْكُرُوا اللَّهَ ذِكْرًا كَثِيرًا", src:"Quran 33:41" },
+                { emoji:"📖", title:"Why read Quran?",    body:"The Quran is Allah's message to us. Every letter we read gives us 10 good deeds! That's a LOT of points! 🌟", ar:"اقْرَأْ بِاسْمِ رَبِّكَ", src:"Quran 96:1" },
+                { emoji:"🤝", title:"Be Kind to everyone",body:"The Prophet ﷺ said: 'The best of you are those who are best in character.' Being kind to family and friends makes Allah happy! 😊", ar:"إِنَّ اللَّهَ يُحِبُّ الْمُحْسِنِينَ", src:"Quran 2:195" },
+                { emoji:"🤲", title:"What is Dua?",       body:"Dua is asking Allah for anything you need. You can make dua anytime, anywhere — Allah is always listening! 👂", ar:"ادْعُونِي أَسْتَجِبْ لَكُمْ", src:"Quran 40:60" },
+                { emoji:"💛", title:"Sadaqah is amazing!", body:"Sadaqah means giving something to help others. Even a smile is sadaqah! And it never makes you poorer — Allah gives back more! 🎁", ar:"مَن ذَا الَّذِي يُقْرِضُ اللَّهَ قَرْضًا حَسَنًا", src:"Quran 2:245" },
+                { emoji:"🌙", title:"What is Ramadan?",   body:"Ramadan is the special month when we fast (no food or drink during the day) to get closer to Allah. The Quran was sent down in this month! 🌙", ar:"شَهْرُ رَمَضَانَ الَّذِي أُنزِلَ فِيهِ الْقُرْآنُ", src:"Quran 2:185" },
+              ];
+              const factIdx = Math.floor(Date.now() / 86400000) % KIDS_FACTS.length;
+              const fact = KIDS_FACTS[factIdx];
+              return (
+                <div style={{ padding:"10px 14px 0" }}>
+                  <div style={{ background:KT.card, borderRadius:20, border:"3px solid "+KT.border,
+                    overflow:"hidden", marginBottom:12 }}>
+                    <div style={{ background:KT.headerBg, padding:"12px 16px", textAlign:"center" }}>
+                      <div style={{ fontSize:11, color:"rgba(255,255,255,0.7)", fontFamily:"sans-serif",
+                        letterSpacing:2, textTransform:"uppercase" }}>Today I Learn</div>
+                    </div>
+                    <div style={{ padding:"20px 16px", textAlign:"center" }}>
+                      <div style={{ fontSize:52, marginBottom:12 }}>{fact.emoji}</div>
+                      <div style={{ fontSize:17, fontWeight:700, color:KT.text,
+                        fontFamily:"'Fredoka One',sans-serif", marginBottom:12 }}>{fact.title}</div>
+                      <div style={{ fontSize:14, color:KT.sub, fontFamily:"sans-serif",
+                        lineHeight:"1.7", marginBottom:16 }}>{fact.body}</div>
+                      <div style={{ fontSize:16, color:KT.gold, fontFamily:"'Amiri Quran','Amiri',serif",
+                        direction:"rtl", lineHeight:"2.2", marginBottom:6 }}>{fact.ar}</div>
+                      <div style={{ fontSize:10, color:KT.muted, fontFamily:"sans-serif",
+                        fontStyle:"italic" }}>— {fact.src}</div>
+                    </div>
+                  </div>
+                  {/* All facts list */}
+                  <div style={{ fontSize:9, color:KT.gold, fontFamily:"sans-serif",
+                    letterSpacing:2, textTransform:"uppercase", marginBottom:8, fontWeight:700 }}>All Lessons</div>
+                  {KIDS_FACTS.map((f,i) => (
+                    <div key={i} style={{ background:i===factIdx?KT.gold+"18":KT.card,
+                      border:"2px solid "+(i===factIdx?KT.gold:KT.border),
+                      borderRadius:14, padding:"12px 14px", marginBottom:8,
+                      display:"flex", alignItems:"center", gap:10 }}>
+                      <span style={{ fontSize:24 }}>{f.emoji}</span>
+                      <div>
+                        <div style={{ fontSize:13, fontWeight:700, color:i===factIdx?KT.gold:KT.text,
+                          fontFamily:"'Fredoka One',sans-serif" }}>{f.title}</div>
+                        <div style={{ fontSize:10, color:KT.muted, fontFamily:"sans-serif" }}>
+                          {i===factIdx?"Today's lesson ✨":"Lesson "+(i+1)}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
+
+            {/* Parent settings modal — no PIN needed */}
             {kidsParent && (
               <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.6)", zIndex:100, display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
                 <div style={{ background:"#fff", borderRadius:20, padding:24, width:"100%", maxWidth:340 }}>
-                  {kidsPinDraft !== kidsPin + "_ok" ? (
-                    <div>
-                      <div style={{ fontSize:16, fontWeight:700, color:"#1a1a1a", fontFamily:"'Lora',serif", marginBottom:4 }}>🔒 Parent Access</div>
-                      <div style={{ fontSize:12, color:"#888", fontFamily:"sans-serif", marginBottom:16 }}>Enter your PIN to access settings</div>
-                      <input type="password" maxLength={4} value={kidsPinDraft} onChange={e => { setKidsPinDraft(e.target.value); setKidsPinError(false); }} placeholder="Enter PIN" style={{ width:"100%", padding:"10px", border:"1px solid " + (kidsPinError ? "#ef4444" : "#e0e0e0"), borderRadius:8, fontSize:18, textAlign:"center", letterSpacing:8, outline:"none", marginBottom:8 }} />
-                      {kidsPinError && <div style={{ fontSize:11, color:"#ef4444", fontFamily:"sans-serif", textAlign:"center", marginBottom:8 }}>Incorrect PIN</div>}
-                      <div style={{ display:"flex", gap:8 }}>
-                        <button onClick={() => { if (kidsPinDraft === kidsPin) { setKidsPinDraft(kidsPin + "_ok"); setKidsPinError(false); } else { setKidsPinError(true); } }} style={{ flex:1, padding:"10px", background:"#7c3aed", border:"none", borderRadius:8, color:"#fff", cursor:"pointer", fontSize:14, fontWeight:600 }}>Unlock</button>
-                        <button onClick={() => setKidsParent(false)} style={{ flex:1, padding:"10px", background:"#f5f5f5", border:"1px solid #e0e0e0", borderRadius:8, color:"#666", cursor:"pointer", fontSize:14 }}>Cancel</button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div>
+                  <div>
                       <div style={{ fontSize:16, fontWeight:700, color:"#1a1a1a", fontFamily:"'Lora',serif", marginBottom:16 }}>⚙️ Parent Settings</div>
 
                       {/* Age group */}
@@ -1291,7 +2881,6 @@ export default function App() {
                         <button onClick={() => { setMode("classic"); setKidsParent(false); setKidsPinDraft(""); }} style={{ flex:1, padding:"10px", background:"#f5f5f5", border:"1px solid #e0e0e0", borderRadius:8, color:"#666", cursor:"pointer", fontSize:12 }}>Exit Kids Mode</button>
                       </div>
                     </div>
-                  )}
                 </div>
               </div>
             )}
@@ -1302,22 +2891,34 @@ export default function App() {
         {!kidsMode && (
         <>
 
-        {/* Tabs */}
-        <div style={{ display:"flex", margin:"10px 14px 0", background:T.alt, borderRadius:12, padding:3, border:"1px solid " + T.border, boxShadow: mode === "gamified" ? "0 1px 4px #6366f122" : "none" }}>
-          {(mode === "gamified"
-            ? [["today","📋","Today"],["garden","🌳","Garden"],["badges","🏅","Badges"],["times","🕐","Times"],["calendar","📅","Cal"],["dua","🤲","Dua"]]
-            : [["today","📋"],["times","🕐"],["calendar","📅"],["dua","🤲"]]
-          ).map(function(item) {
+        {/* ── Bottom nav (fixed) ── */}
+        <div style={{
+          position:"fixed", bottom:0, left:0, right:0, zIndex:50,
+          display:"flex", background:T.card,
+          borderTop:"1px solid " + T.border,
+          boxShadow:"0 -2px 12px rgba(0,0,0,0.08)",
+          maxWidth:480, margin:"0 auto",
+        }}>
+          {[
+            { key:"today",    icon:"📋", label:"Today"    },
+            { key:"muhasaba", icon:"🪞", label:"Reflect"  },
+            { key:"metrics",  icon:"📊", label:"Metrics"  },
+            { key:"more",     icon:"☰",  label:"More"     },
+            { key:"settings", icon:"⚙️", label:"Settings" },
+          ].map(function(item) {
+            const active = tab === item.key;
             return (
-              <button key={item[0]} className="tab-btn" onClick={() => setTab(item[0])} style={{
-                flex:1, padding:"7px 4px", border:"none", cursor:"pointer", borderRadius:9,
-                fontFamily: mode === "gamified" ? "'Nunito',sans-serif" : "'Lora','Georgia',serif", fontSize: mode === "gamified" ? 10 : 12,
-                background: tab === item[0] ? T.card : "transparent",
-                color: tab === item[0] ? (mode === 'gamified' ? '#4f46e5' : GOLD) : T.muted,
-                fontWeight: tab === item[0] ? 600 : 400,
+              <button key={item.key} onClick={() => setTab(item.key)} style={{
+                flex:1, padding:"10px 4px 8px", border:"none", cursor:"pointer",
+                background:"transparent",
+                color: active ? GOLD : T.muted,
+                display:"flex", flexDirection:"column", alignItems:"center", gap:2,
                 transition:"all 0.18s",
               }}>
-                {item[1]} {item[2] || item[0].charAt(0).toUpperCase() + item[0].slice(1)}
+                <span style={{ fontSize:18, lineHeight:"1" }}>{item.icon}</span>
+                <span style={{ fontSize:9, fontFamily:"sans-serif", fontWeight: active ? 700 : 400,
+                  letterSpacing:0.5 }}>{item.label}</span>
+                {active && <div style={{ width:18, height:2, borderRadius:1, background:GOLD, marginTop:1 }} />}
               </button>
             );
           })}
@@ -1326,6 +2927,285 @@ export default function App() {
         {/* ══ TODAY ══ */}
         {tab === "today" && (
           <div style={{ padding:"10px 14px 0" }}>
+
+            {/* ── Smart context-aware banners ── */}
+            {(() => {
+              const nowMins = new Date().getHours()*60 + new Date().getMinutes();
+              function ptMins(key) {
+                if (!prayerTimes || !prayerTimes[key]) return null;
+                const [h,m] = prayerTimes[key].split(":").map(Number);
+                return h*60+m;
+              }
+              const fajrM    = ptMins("Fajr");
+              const dhuhrM   = ptMins("Dhuhr");
+              const maghribM = ptMins("Maghrib");
+              const ishaM    = ptMins("Isha");
+
+              // Morning window: after Fajr, before Dhuhr
+              const isMorningWindow = fajrM && dhuhrM
+                ? nowMins >= fajrM && nowMins < dhuhrM
+                : new Date().getHours() >= 4 && new Date().getHours() < 12;
+
+              // Evening window: after Maghrib, before Isha+90
+              const isEveningWindow = maghribM
+                ? nowMins >= maghribM && nowMins < maghribM + 90
+                : new Date().getHours() >= 18 && new Date().getHours() < 22;
+
+              // After any prayer window (general): show post-prayer
+              const isAfterPrayer = fajrM && (() => {
+                const times = [fajrM, dhuhrM, ptMins("Asr"), maghribM, ishaM].filter(Boolean);
+                return times.some(t => nowMins >= t && nowMins < t + 30);
+              })();
+
+              const banners = [];
+
+              // 1. Friday Surah Al-Kahf reminder
+              if (IS_FRI) {
+                const kahfDone = !!todayChecked["kahf"];
+                banners.push(
+                  <button key="kahf" onClick={() => { setTab("today"); }} style={{
+                    display:"flex", alignItems:"center", gap:10, width:"100%",
+                    padding:"11px 14px", marginBottom:8,
+                    background: kahfDone ? "#f0fdf4" : "linear-gradient(135deg,#eef2ff,#ede9fe)",
+                    border:"1px solid " + (kahfDone ? "#bbf7d0" : "#c7d2fe"), borderRadius:13,
+                    cursor:"pointer", textAlign:"left", opacity: kahfDone ? 0.7 : 1,
+                  }}>
+                    <span style={{ fontSize:22 }}>{kahfDone ? "✅" : "📜"}</span>
+                    <div style={{ flex:1 }}>
+                      <div style={{ fontSize:13, fontWeight:700, color: kahfDone ? "#16a34a" : "#4f46e5", fontFamily:"'Lora',serif" }}>
+                        {kahfDone ? "Surah Al-Kahf read ✓" : "Read Surah Al-Kahf today"}
+                      </div>
+                      <div style={{ fontSize:10, color:T.muted, fontFamily:"sans-serif", marginTop:1 }}>
+                        {kahfDone ? "جزاك الله خيرًا" : "It is Friday — light between two Fridays 🌟"}
+                      </div>
+                    </div>
+                    {!kahfDone && <span style={{ fontSize:16, color:"#4f46e5" }}>›</span>}
+                  </button>
+                );
+              }
+
+              // 2. Morning adhkar after Fajr
+              if (isMorningWindow) {
+                banners.push(
+                  <button key="morning" onClick={() => {
+                    setAdhkarSetKey("morning_evening");
+                    setAdhkarPrayer("Fajr");
+                    setAdhkarScreen("count");
+                    setTab("adhkar");
+                  }} style={{
+                    display:"flex", alignItems:"center", gap:10, width:"100%",
+                    padding:"11px 14px", marginBottom:8,
+                    background:"linear-gradient(135deg,#fef9c3,#fef3c7)",
+                    border:"1px solid #fde68a", borderRadius:13,
+                    cursor:"pointer", textAlign:"left",
+                  }}>
+                    <span style={{ fontSize:22 }}>🌅</span>
+                    <div style={{ flex:1 }}>
+                      <div style={{ fontSize:13, fontWeight:700, color:"#92400e", fontFamily:"'Lora',serif" }}>Morning Adhkar</div>
+                      <div style={{ fontSize:10, color:"#a16207", fontFamily:"sans-serif", marginTop:1 }}>Start your day with remembrance of Allah</div>
+                    </div>
+                    <span style={{ fontSize:16, color:"#92400e" }}>›</span>
+                  </button>
+                );
+              }
+
+              // 3. Evening adhkar after Maghrib
+              if (isEveningWindow) {
+                banners.push(
+                  <button key="evening" onClick={() => {
+                    setAdhkarSetKey("morning_evening");
+                    setAdhkarPrayer("Maghrib");
+                    setAdhkarScreen("count");
+                    setTab("adhkar");
+                  }} style={{
+                    display:"flex", alignItems:"center", gap:10, width:"100%",
+                    padding:"11px 14px", marginBottom:8,
+                    background:"linear-gradient(135deg,#f5f3ff,#ede9fe)",
+                    border:"1px solid #c4b5fd", borderRadius:13,
+                    cursor:"pointer", textAlign:"left",
+                  }}>
+                    <span style={{ fontSize:22 }}>🌇</span>
+                    <div style={{ flex:1 }}>
+                      <div style={{ fontSize:13, fontWeight:700, color:"#5b21b6", fontFamily:"'Lora',serif" }}>Evening Adhkar</div>
+                      <div style={{ fontSize:10, color:"#6d28d9", fontFamily:"sans-serif", marginTop:1 }}>End your day with remembrance of Allah</div>
+                    </div>
+                    <span style={{ fontSize:16, color:"#5b21b6" }}>›</span>
+                  </button>
+                );
+              }
+
+              // 4. Quran verse of the day
+              const verseIdx = Math.floor((new Date().getTime() / 86400000)) % QURAN_VERSES.length;
+              const verse = QURAN_VERSES[verseIdx];
+              banners.push(
+                <div key="verse" style={{
+                  background:T.alt, border:"1px solid "+T.border, borderRadius:13,
+                  padding:"12px 14px", marginBottom:8, textAlign:"center",
+                }}>
+                  <div style={{ fontSize:9, color:T.muted, fontFamily:"sans-serif",
+                    letterSpacing:2, textTransform:"uppercase", marginBottom:8 }}>Verse of the Day</div>
+                  <div style={{ fontSize:17, color:GOLD, fontFamily:"'Amiri Quran','Amiri',serif",
+                    direction:"rtl", lineHeight:"2.2", marginBottom:6 }}>{verse.ar}</div>
+                  <div style={{ fontSize:12, color:T.sub, fontStyle:"italic",
+                    fontFamily:"'Lora',serif", lineHeight:"1.6", marginBottom:4 }}>"{verse.en}"</div>
+                  <div style={{ fontSize:10, color:T.muted, fontFamily:"sans-serif" }}>— Quran {verse.src}</div>
+                </div>
+              );
+
+              // 5. Post-prayer adhkar (always shown, lower priority)
+              banners.push(
+                <button key="post" onClick={() => {
+                  setAdhkarSetKey("post_prayer");
+                  setAdhkarScreen("count");
+                  setTab("adhkar");
+                }} style={{
+                  display:"flex", alignItems:"center", gap:10, width:"100%",
+                  padding:"11px 14px", marginBottom:10,
+                  background:"linear-gradient(135deg," + GOLD + "18," + GOLD + "08)",
+                  border:"1px solid " + GOLD + "44", borderRadius:13,
+                  cursor:"pointer", textAlign:"left",
+                }}>
+                  <span style={{ fontSize:22 }}>📿</span>
+                  <div style={{ flex:1 }}>
+                    <div style={{ fontSize:13, fontWeight:700, color:GOLD, fontFamily:"'Lora',serif" }}>
+                      {isAfterPrayer ? "Time for Post-Prayer Adhkar" : "Post-Prayer Adhkar"}
+                    </div>
+                    <div style={{ fontSize:10, color:T.muted, fontFamily:"sans-serif", marginTop:1 }}>SubhanAllah · Alhamdulillah · Allahu Akbar · Ayat al-Kursi</div>
+                  </div>
+                  <span style={{ fontSize:16, color:GOLD }}>›</span>
+                </button>
+              );
+
+              return banners;
+            })()}
+
+            {/* Exemption day banner for females */}
+            {isFemale && (
+              <div style={{ marginBottom:10 }}>
+                <button onClick={toggleExempt} style={{
+                  display:"flex", alignItems:"center", gap:10, width:"100%",
+                  padding:"11px 14px",
+                  background: isExempt ? "#fdf2f8" : T.card,
+                  border:"1px solid " + (isExempt ? "#f9a8d4" : T.border),
+                  borderRadius:13, cursor:"pointer", textAlign:"left", transition:"all 0.18s",
+                }}>
+                  <span style={{ fontSize:20 }}>{isExempt ? "🌸" : "🌸"}</span>
+                  <div style={{ flex:1 }}>
+                    <div style={{ fontSize:13, fontWeight:700,
+                      color: isExempt ? "#be185d" : T.sub,
+                      fontFamily:"'Lora',serif" }}>
+                      {isExempt ? "Exemption day active" : "Mark as exemption day"}
+                    </div>
+                    <div style={{ fontSize:10, color: isExempt ? "#ec4899" : T.muted,
+                      fontFamily:"sans-serif", marginTop:1 }}>
+                      {isExempt
+                        ? "Prayers paused — du'a and dhikr are still open 🤍"
+                        : "Tap to mark — prayers will be hidden for today"}
+                    </div>
+                  </div>
+                  <div style={{
+                    width:22, height:22, borderRadius:6,
+                    background: isExempt ? "#ec4899" : "transparent",
+                    border:"2px solid " + (isExempt ? "#ec4899" : T.border),
+                    display:"flex", alignItems:"center", justifyContent:"center",
+                    fontSize:12, color:"#fff", flexShrink:0,
+                    transition:"all 0.18s",
+                  }}>{isExempt ? "✓" : ""}</div>
+                </button>
+                {isExempt && (
+                  <div style={{ background:"#fdf2f8", border:"1px solid #f9a8d4",
+                    borderRadius:"0 0 12px 12px", padding:"10px 14px",
+                    marginTop:-4, borderTop:"none" }}>
+                    <div style={{ fontSize:13, color:"#be185d",
+                      fontFamily:"'Amiri Quran','Amiri',serif",
+                      direction:"rtl", textAlign:"center", lineHeight:"2" }}>
+                      اللَّهُمَّ إِنِّي أَسْأَلُكَ رِضَاكَ وَالْجَنَّةَ
+                    </div>
+                    <div style={{ fontSize:10, color:"#ec4899", textAlign:"center",
+                      fontFamily:"sans-serif", fontStyle:"italic", marginTop:2 }}>
+                      "O Allah, I ask You for Your pleasure and for Paradise"
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ── Eid section ── */}
+            {IS_EID && (
+              <div style={{ marginBottom:12, borderRadius:13,
+                border:"1px solid #fde68a", overflow:"hidden",
+                background:"linear-gradient(135deg,#fffbeb,#fef9c3)" }}>
+
+                {/* Header */}
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center",
+                  padding:"10px 13px 8px", borderBottom:"1px solid #fde68a" }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                    <span style={{ fontSize:18 }}>🌙</span>
+                    <span style={{ fontSize:13, fontWeight:700, color:"#92400e",
+                      fontFamily:"'Lora',serif" }}>{EID_NAME}</span>
+                    <span style={{ fontSize:13, color:"#a16207",
+                      fontFamily:"'Amiri',serif" }}>{EID_AR}</span>
+                  </div>
+                  <span style={{ fontSize:10, fontFamily:"sans-serif", fontWeight:700,
+                    color:"#92400e", background:"#fde68a", padding:"2px 8px", borderRadius:7 }}>
+                    ✨ Eid Mubarak
+                  </span>
+                </div>
+
+                {/* Eid prayer deed */}
+                <div style={{ display:"flex", alignItems:"center" }}>
+                  <button className="row-btn" onClick={() => toggle("eid_prayer")} style={{
+                    display:"flex", alignItems:"center", gap:9, flex:1,
+                    padding:"10px 13px", background:"transparent", border:"none",
+                    borderLeft: todayChecked["eid_prayer"] ? "3px solid #f59e0b" : "3px solid transparent",
+                    cursor:"pointer", textAlign:"left",
+                    opacity: todayChecked["eid_prayer"] ? 0.55 : 1,
+                  }}>
+                    <span style={{ fontSize:18, width:22, textAlign:"center" }}>🕌</span>
+                    <div style={{ flex:1 }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                        <span style={{ fontSize:13, fontWeight:500, color:T.text,
+                          textDecoration: todayChecked["eid_prayer"] ? "line-through" : "none" }}>
+                          Eid Prayer
+                        </span>
+                        <span style={{ fontSize:12, color:T.muted, fontFamily:"'Amiri',serif" }}>
+                          صلاة العيد
+                        </span>
+                      </div>
+                      <div style={{ fontSize:10, color:"#a16207", fontFamily:"sans-serif" }}>
+                        2 rak'ahs with extra takbeer — prayed in congregation
+                      </div>
+                    </div>
+                    <Checkbox checked={!!todayChecked["eid_prayer"]} color="#f59e0b" />
+                  </button>
+                </div>
+
+                {/* Takbeer */}
+                <div style={{ padding:"10px 13px", borderTop:"1px solid #fde68a" }}>
+                  <div style={{ fontSize:10, color:"#a16207", fontFamily:"sans-serif",
+                    letterSpacing:1, textTransform:"uppercase", marginBottom:6 }}>
+                    Eid Takbeer
+                  </div>
+                  <div style={{ fontSize:15, color:"#92400e",
+                    fontFamily:"'Amiri Quran','Amiri',serif",
+                    direction:"rtl", lineHeight:"2.2", textAlign:"center" }}>
+                    {EID_TAKBEER.split("♥").map((phrase, i) => (
+                      <div key={i}>{phrase.trim()}</div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Fasting forbidden note */}
+                <div style={{ padding:"8px 13px 10px", borderTop:"1px solid #fde68a",
+                  background:"#fff7ed", display:"flex", alignItems:"center", gap:8 }}>
+                  <span style={{ fontSize:16 }}>⚠️</span>
+                  <div style={{ fontSize:11, color:"#9a3412", fontFamily:"sans-serif" }}>
+                    <strong>Fasting is forbidden on Eid</strong> — it is haram to fast today.
+                    Eat, celebrate and give thanks to Allah. 🍽️
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Ramadan section */}
             {IS_RAMADAN && (
@@ -1363,11 +3243,66 @@ export default function App() {
               </div>
             )}
 
+            {/* ── Sunnah Fasts reminder ── */}
+            {!IS_RAMADAN && !IS_EID && (() => {
+              const WHITE_DAYS = [13,14,15];
+              const isWhiteDay = WHITE_DAYS.includes(hijri.day);
+              const isMonThu   = DOW === 1 || DOW === 4;
+              const isArafah   = hijri.month === 12 && hijri.day === 9;
+              const isAshura   = hijri.month === 1  && hijri.day === 10;
+              const isMuharram = hijri.month === 1  && hijri.day === 9;
+              const isShabanFast = hijri.month === 8 && hijri.day <= 15;
+              const fastLabel  = isArafah ? "Day of Arafah fast 🕌 — expiation for 2 years"
+                : isAshura ? "Day of Ashura fast — expiation for previous year"
+                : isMuharram ? "9th Muharram — recommended to fast with Ashura"
+                : isWhiteDay ? "Ayyam al-Beed — White Days fast (day "+hijri.day+")"
+                : isMonThu ? (DOW===1?"Monday":"Thursday")+" — Sunnah fast day"
+                : isShabanFast ? "Sha'ban fast — Prophet ﷺ fasted much in Sha'ban"
+                : null;
+              if (!fastLabel) return null;
+              const fastDone = !!todayChecked["fast_today"];
+              return (
+                <div style={{ marginBottom:8, borderRadius:12,
+                  border:"1px solid "+(isArafah||isAshura?"#c7d2fe":"#fde68a"),
+                  background:isArafah||isAshura?"#eef2ff":"#fffbeb",
+                  display:"flex", alignItems:"center", gap:10, padding:"10px 13px" }}>
+                  <span style={{ fontSize:18 }}>{isArafah||isAshura?"🕌":"🌙"}</span>
+                  <div style={{ flex:1 }}>
+                    <div style={{ fontSize:12, fontWeight:600,
+                      color:isArafah||isAshura?"#4338ca":"#92400e",
+                      fontFamily:"'Lora',serif" }}>{fastLabel}</div>
+                    <div style={{ fontSize:10, color:isArafah||isAshura?"#6366f1":"#a16207",
+                      fontFamily:"sans-serif", marginTop:1 }}>
+                      {fastDone ? "✅ Fasting today — بارك الله فيك" : "Tap to mark fast in your deeds below"}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Salah — hidden on exemption days */}
+            {isFemale && isExempt && (
+              <div style={{ background:"#fdf2f8", border:"1px solid #f9a8d4",
+                borderRadius:13, padding:"16px 14px", marginBottom:10, textAlign:"center" }}>
+                <div style={{ fontSize:22, marginBottom:6 }}>🌸</div>
+                <div style={{ fontSize:13, color:"#be185d", fontWeight:600,
+                  fontFamily:"'Lora',serif", marginBottom:4 }}>Exemption day</div>
+                <div style={{ fontSize:11, color:"#ec4899", fontFamily:"sans-serif",
+                  lineHeight:"1.6" }}>
+                  Prayers are paused today. You can still make du'a,<br/>
+                  read Quran, and do dhikr. 🤍
+                </div>
+              </div>
+            )}
             {/* Salah — individual prayer boxes */}
-            {PRAYERS.map(function(prayer) {
+            {(!isFemale || !isExempt) && PRAYERS.map(function(prayer) {
               const visRows = prayer.rows.filter(function(row) { return !row.ramadan || IS_RAMADAN; });
-              const pDone   = visRows.filter(r => todayChecked[r.id]).length;
-              const allDone = pDone === visRows.length;
+              const pDone    = visRows.filter(r => todayChecked[r.id]).length;
+              const allDone  = pDone === visRows.length;
+              const fardRows = visRows.filter(r => r.type === "F");
+              const inMasjid = masjidPrayers.includes(prayer.id);
+              // Only show masjid button for main 5 prayers (not duha/tahajjud)
+              const showMasjid = ["fajr","dhuhr","asr","maghrib","isha"].includes(prayer.id);
               // Map prayer id to Aladhan timings key
               const PT_KEY  = { fajr:"Fajr", duha:"Sunrise", dhuhr:"Dhuhr", asr:"Asr", maghrib:"Maghrib", isha:"Isha", tahajjud:"Midnight" };
               const ptRaw   = prayerTimes && PT_KEY[prayer.id] ? prayerTimes[PT_KEY[prayer.id]] : null;
@@ -1391,7 +3326,25 @@ export default function App() {
                       <span style={{ fontSize:13, color:T.muted, fontFamily:"'Amiri',serif" }}>{prayer.ar}</span>
                       {ptFmt && <span style={{ fontSize:11, color:GOLD, fontFamily:"sans-serif", fontWeight:600, background:GOLD + "15", padding:"1px 7px", borderRadius:8, marginLeft:2 }}>{ptFmt}</span>}
                     </div>
-                    <span style={{ fontSize:10, fontFamily:"sans-serif", fontWeight:700, color:T.salahAc, background:T.salahAc + "18", padding:"2px 7px", borderRadius:7 }}>{pDone}/{visRows.length}</span>
+                    <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                      {inMasjid && (
+                        <span style={{ fontSize:10, color:"#0369a1", background:"#e0f2fe",
+                          padding:"1px 6px", borderRadius:6, fontFamily:"sans-serif", fontWeight:700 }}>
+                          🕌 Jamaah
+                        </span>
+                      )}
+                      <span style={{ fontSize:10, fontFamily:"sans-serif", fontWeight:700, color:T.salahAc, background:T.salahAc + "18", padding:"2px 7px", borderRadius:7 }}>{pDone}/{visRows.length}</span>
+                      {showMasjid && (
+                        <button onClick={() => toggleMasjid(prayer.id, fardRows.map(r=>r.id))} style={{
+                          padding:"3px 8px", borderRadius:8,
+                          border:"1px solid " + (inMasjid ? "#0369a1" : T.border),
+                          background: inMasjid ? "#0369a1" : T.alt,
+                          color: inMasjid ? "#fff" : T.muted,
+                          cursor:"pointer", fontSize:11, fontFamily:"sans-serif",
+                          transition:"all 0.18s",
+                        }}>🕌</button>
+                      )}
+                    </div>
                   </div>
                   {/* Prayer rows */}
                   <div style={{ paddingBottom:4 }}>
@@ -1454,6 +3407,11 @@ export default function App() {
                               {task.ar && <span style={{ fontSize:12, color:T.muted, fontFamily:"'Amiri',serif" }}>{task.ar}</span>}
                             </div>
                             {task.note && <div style={{ fontSize:10, color:S.ac + "bb", fontFamily:"sans-serif" }}>{task.note}</div>}
+                            {isFemale && task.id === "jumuah" && (
+                              <div style={{ fontSize:10, color:"#7c3aed", fontFamily:"sans-serif", fontWeight:600, marginTop:1 }}>
+                                🟣 Optional for women — rewarded if attended
+                              </div>
+                            )}
                             {notes[nk] && <div style={{ fontSize:10, color:T.muted, fontStyle:"italic", fontFamily:"sans-serif", marginTop:1 }}>📝 {notes[nk]}</div>}
                           </div>
                           <div className={chk ? "check-pop" : ""}>
@@ -1500,15 +3458,36 @@ export default function App() {
         {/* ══ CALENDAR ══ */}
         {tab === "calendar" && (
           <div style={{ padding:"10px 14px 0" }}>
+              <button onClick={() => setTab("more")} style={{
+                display:"flex", alignItems:"center", gap:6, background:"none", border:"none",
+                cursor:"pointer", color:T.muted, fontSize:12, fontFamily:"sans-serif",
+                padding:"0 0 10px", marginTop:4,
+              }}>
+                ← Back
+              </button>
+
 
             {/* Month nav */}
-            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", background:T.card, borderRadius:13, border:"1px solid " + T.border, padding:"10px 14px", marginBottom:10 }}>
-              <button onClick={prevMonth} style={{ background:T.alt, border:"1px solid " + T.border, borderRadius:10, cursor:"pointer", color:GOLD, fontSize:22, padding:"6px 16px", minWidth:44 }}>‹</button>
-              <div style={{ textAlign:"center" }}>
-                <div style={{ fontSize:14, fontWeight:600, color:T.text, fontFamily:"'Lora',serif" }}>{MON_SHORT[calMonth]} {calYear}</div>
-              </div>
-              <button onClick={nextMonth} style={{ background:T.alt, border:"1px solid " + T.border, borderRadius:10, cursor:"pointer", color: isCurrentMonth ? T.muted : GOLD, fontSize:22, padding:"6px 16px", minWidth:44, opacity: isCurrentMonth ? 0.3 : 1 }}>›</button>
-            </div>
+            {(() => {
+              // Compute Hijri month for the 15th of this Gregorian month (middle of month)
+              const midGreg = new Date(calYear, calMonth, 15);
+              const midHijri = toHijri(midGreg);
+              return (
+                <div style={{ background:T.card, borderRadius:13, border:"1px solid "+T.border, padding:"10px 14px", marginBottom:10 }}>
+                  <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:6 }}>
+                    <button onClick={prevMonth} style={{ background:T.alt, border:"1px solid "+T.border, borderRadius:10, cursor:"pointer", color:GOLD, fontSize:22, padding:"6px 16px", minWidth:44 }}>‹</button>
+                    <div style={{ textAlign:"center" }}>
+                      <div style={{ fontSize:14, fontWeight:600, color:T.text, fontFamily:"'Lora',serif" }}>{MON_SHORT[calMonth]} {calYear}</div>
+                    </div>
+                    <button onClick={nextMonth} style={{ background:T.alt, border:"1px solid "+T.border, borderRadius:10, cursor:"pointer", color:isCurrentMonth?T.muted:GOLD, fontSize:22, padding:"6px 16px", minWidth:44, opacity:isCurrentMonth?0.3:1 }}>›</button>
+                  </div>
+                  {/* Hijri month range */}
+                  <div style={{ textAlign:"center", fontSize:12, color:GOLD, fontFamily:"'Amiri',serif" }}>
+                    {HM_AR[midHijri.month-1]} — {HM_EN[midHijri.month-1]} {midHijri.year} AH
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Day-of-week headers */}
             <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:3, marginBottom:4 }}>
@@ -1530,16 +3509,29 @@ export default function App() {
                 const isFut = new Date(calYear, calMonth, day) > TODAY;
                 const alpha = isFut ? "0.04" : String(Math.max(0.07, dp/100));
                 const rgb   = theme === "light" ? "194,124,42" : "200,169,110";
+                const hDay = toHijri(new Date(calYear, calMonth, day));
                 return (
-                  <div key={day} onClick={() => !isFut && setSelectedDay(k)}
-                    style={{ aspectRatio:"1", borderRadius:8, position:"relative", background:"rgba(" + rgb + "," + alpha + ")", border: isT ? "2px solid " + GOLD : "1px solid " + T.border, cursor: isFut ? "default" : "pointer" }}>
-                    <div style={{ position:"absolute", top:2, left:0, right:0, textAlign:"center", fontSize:9, fontWeight: isT ? 700 : 400, color: isT ? GOLD : T.sub, fontFamily:"sans-serif" }}>{day}</div>
-                    {!isFut && dp > 0 && (
-                      <div style={{ position:"absolute", bottom:2, left:0, right:0, textAlign:"center", fontSize:7, fontWeight:700, color: dp === 100 ? GOLD : T.muted, fontFamily:"sans-serif" }}>
-                        {dp === 100 ? "⭐" : dp + "%"}
+                      <div key={day} onClick={() => !isFut && setSelectedDay(k)}
+                        style={{ aspectRatio:"1", borderRadius:8, position:"relative",
+                          background:"rgba("+rgb+","+alpha+")",
+                          border:isT?"2px solid "+GOLD:"1px solid "+T.border,
+                          cursor:isFut?"default":"pointer" }}>
+                        <div style={{ position:"absolute", top:2, left:0, right:0, textAlign:"center",
+                          fontSize:9, fontWeight:isT?700:400,
+                          color:isT?GOLD:T.sub, fontFamily:"sans-serif" }}>{day}</div>
+                        {/* Hijri day number */}
+                        <div style={{ position:"absolute", top:"40%", left:0, right:0, textAlign:"center",
+                          fontSize:7, color:T.muted, fontFamily:"'Amiri',serif", opacity:0.7 }}>
+                          {hDay.day}
+                        </div>
+                        {!isFut && dp > 0 && (
+                          <div style={{ position:"absolute", bottom:2, left:0, right:0, textAlign:"center",
+                            fontSize:7, fontWeight:700,
+                            color:dp===100?GOLD:T.muted, fontFamily:"sans-serif" }}>
+                            {dp===100?"⭐":dp+"%"}
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
                 );
               })}
             </div>
@@ -1577,6 +3569,14 @@ export default function App() {
         {/* ══ PRAYER TIMES ══ */}
         {tab === "times" && (
           <div style={{ padding:"10px 14px 0" }}>
+              <button onClick={() => setTab("more")} style={{
+                display:"flex", alignItems:"center", gap:6, background:"none", border:"none",
+                cursor:"pointer", color:T.muted, fontSize:12, fontFamily:"sans-serif",
+                padding:"0 0 10px", marginTop:4,
+              }}>
+                ← Back
+              </button>
+
 
             {/* Next prayer card */}
             {prayerTimes && (() => {
@@ -1706,208 +3706,422 @@ export default function App() {
               </div>
             </div>
 
+            {/* Notifications */}
+            <div style={{ background:T.card, borderRadius:14, border:"1px solid "+T.border, overflow:"hidden", marginBottom:12 }}>
+              <div style={{ padding:"10px 14px 8px", borderBottom:"1px solid "+T.border, fontSize:10, letterSpacing:3, textTransform:"uppercase", fontWeight:700, fontFamily:"sans-serif", color:GOLD }}>Notifications</div>
+              <div style={{ padding:"12px 14px" }}>
+                {!("Notification" in window) ? (
+                  <div style={{ fontSize:12, color:T.muted, fontFamily:"sans-serif", fontStyle:"italic" }}>
+                    Notifications not supported on this device
+                  </div>
+                ) : (
+                  <>
+                    {/* Enable/disable */}
+                    {/* Show denied warning */}
+                    {Notification.permission === "denied" && (
+                      <div style={{ background:"#fef2f2", border:"1px solid #fecaca",
+                        borderRadius:8, padding:"8px 10px", marginBottom:10,
+                        fontSize:11, color:"#dc2626", fontFamily:"sans-serif" }}>
+                        ⚠️ Notifications blocked. Enable them in your device/browser settings, then refresh.
+                      </div>
+                    )}
+                    <button onClick={function(e) {
+                      e.preventDefault();
+                      if (notifEnabled) { disableNotifications(); }
+                      else { requestNotifications(); }
+                    }} style={{
+                      display:"flex", alignItems:"center", gap:10, width:"100%",
+                      padding:"11px 12px", marginBottom: notifEnabled ? 12 : 0,
+                      background: notifEnabled ? "#f0fdf4" : T.alt,
+                      border:"1px solid "+(notifEnabled?"#bbf7d0":T.border),
+                      borderRadius:11, cursor:"pointer", textAlign:"left", transition:"all 0.18s",
+                    }}>
+                      <span style={{ fontSize:20 }}>{notifEnabled ? "🔔" : "🔕"}</span>
+                      <div style={{ flex:1 }}>
+                        <div style={{ fontSize:13, fontWeight:700,
+                          color:notifEnabled?"#16a34a":T.text, fontFamily:"'Lora',serif" }}>
+                          {notifEnabled ? "Prayer reminders on" : "Enable prayer reminders"}
+                        </div>
+                        <div style={{ fontSize:10, color:T.muted, fontFamily:"sans-serif", marginTop:1 }}>
+                          {notifEnabled
+                            ? "Tap to turn off · Notified at each prayer time"
+                            : "Tap to enable · Fajr, Dhuhr, Asr, Maghrib, Isha"}
+                        </div>
+                      </div>
+                      <div style={{ width:22, height:22, borderRadius:6, flexShrink:0,
+                        background:notifEnabled?"#16a34a":"transparent",
+                        border:"2px solid "+(notifEnabled?"#16a34a":T.border),
+                        display:"flex", alignItems:"center", justifyContent:"center",
+                        fontSize:12, color:"#fff", transition:"all 0.18s" }}>
+                        {notifEnabled?"✓":""}
+                      </div>
+                    </button>
+
+                    {/* Offset slider */}
+                    {notifEnabled && (
+                      <div>
+                        <div style={{ fontSize:11, color:T.sub, fontFamily:"sans-serif", marginBottom:6 }}>
+                          Notify me
+                          <strong style={{ color:GOLD }}> {notifOffset === 0 ? "at prayer time" : notifOffset+" min before"}</strong>
+                        </div>
+                        <input type="range" min="0" max="30" step="5" value={notifOffset}
+                          onChange={e => { const v=parseInt(e.target.value); setNotifOffset(v); save("yawm_notif_offset",v); scheduleNotifications(); }}
+                          style={{ width:"100%", accentColor:GOLD, cursor:"pointer" }} />
+                        <div style={{ display:"flex", justifyContent:"space-between", marginTop:4 }}>
+                          <span style={{ fontSize:9, color:T.muted, fontFamily:"sans-serif" }}>At prayer time</span>
+                          <span style={{ fontSize:9, color:T.muted, fontFamily:"sans-serif" }}>30 min before</span>
+                        </div>
+                        <div style={{ marginTop:8, padding:"8px 10px", background:GOLD+"10",
+                          borderRadius:8, border:"1px solid "+GOLD+"33" }}>
+                          <div style={{ fontSize:10, color:GOLD, fontFamily:"sans-serif" }}>
+                            ℹ️ Notifications require prayer times to be loaded. Make sure location is enabled.
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+
           </div>
         )}
 
         {/* ══ GARDEN ══ */}
-        {tab === "garden" && mode === "gamified" && (
-          <div style={{ padding:"10px 14px 0" }}>
-            {(() => {
-              // Count deeds across ALL journey history
-              const allHist = { ...journeyHist, [TODAY_KEY]: hist[TODAY_KEY] || {} };
-              const totals = {
-                fard:    Object.values(allHist).reduce((s,h)=>s+(["fajr_fard","dhuhr_fard","asr_fard","magh_fard","isha_fard"].filter(k=>h[k]).length),0),
-                sunnah:  Object.values(allHist).reduce((s,h)=>s+(["fajr_sun","dhuhr_sunB","dhuhr_sunA","magh_sunA","isha_sunA"].filter(k=>h[k]).length),0),
-                witr:    Object.values(allHist).filter(h=>h["witr"]).length,
-                quran:   Object.values(allHist).filter(h=>h["quran_recite"]).length,
-                sadaqah: Object.values(allHist).filter(h=>h["sadaqah_daily"]).length,
-                tahajjud:Object.values(allHist).filter(h=>h["tahajjud_pray"]).length,
-                duha:    Object.values(allHist).filter(h=>h["duha_pray"]).length,
-                adhkar:  Object.values(allHist).reduce((s,h)=>s+(["adhkar_morning","adhkar_evening","adhkar_sleep"].filter(k=>h[k]).length),0),
-              };
+        {tab === "garden" && mode === "gamified" && (() => {
+          // ── Daily garden — reflects TODAY only, resets each day ──────────────
+          const todayH = hist[TODAY_KEY] || {};
 
-              // Garden elements — each unlocks at threshold
-              const TREES    = Math.min(Math.floor(totals.fard / 5), 12);
-              const FLOWERS  = Math.min(Math.floor(totals.sunnah / 3), 15);
-              const STARS    = Math.min(Math.floor(totals.witr / 2), 10);
-              const RIVER    = totals.quran >= 7;
-              const FOUNTAIN = totals.sadaqah >= 5;
-              const PALACE   = streak >= 30;
-              const GATE     = streak >= 7;
-              const BIRDS    = totals.tahajjud >= 5;
-              const SUN      = totals.duha >= 5;
-              const DHIKR_GLOW = totals.adhkar >= 10;
+          // What has been done today
+          const FARD_DONE    = ["fajr_fard","dhuhr_fard","asr_fard","magh_fard","isha_fard"].filter(k=>todayH[k]).length; // 0-5
+          const SUNNAH_DONE  = ["fajr_sun","dhuhr_sunB","dhuhr_sunA","magh_sunA","isha_sunA"].filter(k=>todayH[k]).length;
+          const HAS_WITR     = !!todayH["witr"];
+          const HAS_QURAN    = !!todayH["quran_recite"];
+          const HAS_SADAQAH  = !!todayH["sadaqah_daily"];
+          const HAS_TAHAJJUD = !!todayH["tahajjud_pray"];
+          const HAS_DUHA     = !!todayH["duha_pray"];
+          const HAS_ADHKAR   = !!(todayH["adhkar_morning"] || todayH["adhkar_evening"]);
 
-              return (
-                <>
-                  {/* Garden canvas */}
-                  <div style={{ borderRadius:20, overflow:"hidden", marginBottom:12, border:"2px solid #6366f155",
-                    background:"linear-gradient(180deg,#dbeafe 0%,#bfdbfe 25%,#86efac 60%,#4ade80 100%)",
-                    minHeight:320, position:"relative", padding:"10px" }}>
+          // Streak-based rewards (carry over — earned through consistency)
+          const PALACE = streak >= 30;
+          const GATE   = streak >= 7;
 
-                    {/* Sky */}
-                    <div style={{ position:"absolute", top:0, left:0, right:0, height:"45%",
-                      background: SUN
-                        ? "linear-gradient(180deg,#fef9c3,#bfdbfe)"
-                        : "linear-gradient(180deg,#dbeafe,#bfdbfe)" }} />
+          // Garden richness score 0-100 for sky colour
+          const richness = Math.round(
+            (FARD_DONE/5)*40 + (SUNNAH_DONE/5)*15 +
+            (HAS_QURAN?15:0) + (HAS_WITR?10:0) +
+            (HAS_DUHA?5:0) + (HAS_TAHAJJUD?10:0) + (HAS_SADAQAH?5:0)
+          );
 
-                    {/* Sun / Moon */}
-                    {SUN
-                      ? <div style={{ position:"absolute", top:14, right:24, fontSize:36 }}>☀️</div>
-                      : <div style={{ position:"absolute", top:14, right:24, fontSize:28, opacity:0.6 }}>🌙</div>}
+          // Sky changes with richness
+          const skyGrad = richness >= 80
+            ? "linear-gradient(180deg,#fef9c3 0%,#bfdbfe 50%)"   // golden hour
+            : richness >= 50
+            ? "linear-gradient(180deg,#dbeafe 0%,#bfdbfe 50%)"   // bright blue
+            : richness >= 20
+            ? "linear-gradient(180deg,#e0f2fe 0%,#bae6fd 50%)"   // pale blue
+            : "linear-gradient(180deg,#f1f5f9 0%,#e2e8f0 50%)";  // grey — nothing done
 
-                    {/* Birds */}
-                    {BIRDS && <div style={{ position:"absolute", top:22, left:"20%", fontSize:16, letterSpacing:4 }}>🕊️🕊️</div>}
+          // Hadith-linked garden elements — varied positions, different tree types
+          // 5 prayer trees: palm 🌴, pine 🎄, deciduous 🌳, willow 🌿(use 🪴), baobab/oak 🌲
+          // Scattered naturally — front trees lower/bigger, back trees higher/smaller (depth)
+          const PRAYER_TREES = [
+            { key:"fajr",    fardKey:"fajr_fard",  emoji:"🌴", x:"7%",  y:"34%", size:34, label:"Fajr — Palm",      hadith:"Fard prayer plants a tree in Jannah" },
+            { key:"dhuhr",   fardKey:"dhuhr_fard", emoji:"🌲", x:"78%", y:"28%", size:26, label:"Dhuhr — Pine",     hadith:"" },
+            { key:"asr",     fardKey:"asr_fard",   emoji:"🌳", x:"42%", y:"36%", size:36, label:"Asr — Oak",        hadith:"" },
+            { key:"maghrib", fardKey:"magh_fard",  emoji:"🎋", x:"88%", y:"38%", size:28, label:"Maghrib — Bamboo", hadith:"" },
+            { key:"isha",    fardKey:"isha_fard",  emoji:"🌵", x:"24%", y:"26%", size:24, label:"Isha — Cedar",     hadith:"" },
+          ];
+          // Sunnah flowers — scattered at varying heights near ground
+          const FLOWER_POSITIONS = [
+            { x:"6%",  y:"60%", size:20 },
+            { x:"18%", y:"64%", size:16 },
+            { x:"31%", y:"58%", size:18 },
+            { x:"55%", y:"63%", size:20 },
+            { x:"70%", y:"57%", size:16 },
+          ];
+          const SUNNAH_KEYS = ["fajr_sun","dhuhr_sunB","dhuhr_sunA","magh_sunA","isha_sunA"];
+          const FLOWER_EMOJIS = ["🌸","🌺","🌼","🌻","🌹"];
 
-                    {/* Dhikr glow */}
-                    {DHIKR_GLOW && (
-                      <div style={{ position:"absolute", top:10, left:"40%", fontSize:13, color:"#a855f7",
-                        fontFamily:"'Amiri',serif", opacity:0.7 }}>✨ سُبْحَانَ اللَّه ✨</div>
-                    )}
+          const GARDEN_ITEMS = [
+            ...PRAYER_TREES.map(t => ({
+              key:t.key, show:!!todayH[t.fardKey],
+              emoji:t.emoji, x:t.x, y:t.y, size:t.size,
+              label:t.label, hadith:t.hadith,
+            })),
+            ...SUNNAH_KEYS.map((k,i) => ({
+              key:"sun_"+i, show:!!todayH[k],
+              emoji:FLOWER_EMOJIS[i],
+              x:FLOWER_POSITIONS[i].x, y:FLOWER_POSITIONS[i].y,
+              size:FLOWER_POSITIONS[i].size, label:"Sunnah flower", hadith:"",
+            })),
+            // Witr → two stars, spread across sky
+            { key:"witr",     show:HAS_WITR,      emoji:"⭐", x:"15%", y:"7%",  size:18, label:"Witr star",        hadith:"Do not sleep without Witr" },
+            { key:"witr2",    show:HAS_WITR,      emoji:"✨", x:"60%", y:"9%",  size:14, label:"",                  hadith:"" },
+            // Quran → River (rendered separately as strip)
+            { key:"quran",    show:HAS_QURAN,     emoji:"💧", x:"50%", y:"66%", size:0,  label:"River of Quran",   hadith:"Recite Quran, for it will intercede — Muslim 804" },
+            // Duha → Sun top right
+            { key:"duha",     show:HAS_DUHA,      emoji:"☀️", x:"84%", y:"5%",  size:34, label:"Duha sun",         hadith:"Whoever prays Duha — Tirmidhi 474" },
+            // Moon when no duha (always shown dimly in background)
+            { key:"moon",     show:!HAS_DUHA,     emoji:"🌙", x:"84%", y:"5%",  size:22, label:"",                  hadith:"" },
+            // Tahajjud → doves, spread across sky
+            { key:"tahajjud", show:HAS_TAHAJJUD,  emoji:"🕊️", x:"28%", y:"11%", size:16, label:"Tahajjud dove",    hadith:"Best prayer after obligatory — Muslim 1163" },
+            { key:"tahajjud2",show:HAS_TAHAJJUD,  emoji:"🕊️", x:"44%", y:"8%",  size:14, label:"",                  hadith:"" },
+            // Adhkar → sparkles scattered
+            { key:"adhkar",   show:HAS_ADHKAR,    emoji:"✨", x:"52%", y:"14%", size:16, label:"Dhikr light",      hadith:"SubhanAllah plants a tree in Jannah — Tirmidhi 3464" },
+            { key:"adhkar2",  show:HAS_ADHKAR,    emoji:"✨", x:"34%", y:"17%", size:12, label:"",                  hadith:"" },
+            // Sadaqah → fountain, left side mid-ground
+            { key:"sadaqah",  show:HAS_SADAQAH,   emoji:"⛲", x:"20%", y:"50%", size:24, label:"Sadaqah fountain", hadith:"Sadaqah extinguishes sin — Tirmidhi 614" },
+            // Streak gate / palace — centred, dominant
+            { key:"gate",     show:GATE&&!PALACE, emoji:"🕌", x:"50%", y:"22%", size:40, label:"Gate of Jannah",   hadith:"7-day streak — باب الجنة" },
+            { key:"palace",   show:PALACE,         emoji:"🏰", x:"50%", y:"16%", size:52, label:"Palace of Jannah", hadith:"30-day streak — قصر في الجنة" },
+            // Eid — top left, separate from sun
+            { key:"eid",      show:IS_EID,          emoji:"🌙", x:"10%", y:"5%",  size:20, label:"Eid Mubarak",      hadith:"تَقَبَّلَ اللَّهُ مِنَّا وَمِنْكُمْ" },
+          ];
 
-                    {/* Palace / Gate */}
-                    {PALACE && (
-                      <div style={{ position:"absolute", top:"28%", left:"50%", transform:"translateX(-50%)",
-                        textAlign:"center" }}>
-                        <div style={{ fontSize:52 }}>🏰</div>
-                        <div style={{ fontSize:9, color:"#1e3a5f", fontFamily:"sans-serif", fontWeight:700,
-                          background:"#fff8", padding:"1px 6px", borderRadius:6 }}>Palace of Jannah</div>
-                      </div>
-                    )}
-                    {GATE && !PALACE && (
-                      <div style={{ position:"absolute", top:"32%", left:"50%", transform:"translateX(-50%)",
-                        textAlign:"center" }}>
-                        <div style={{ fontSize:40 }}>🕌</div>
-                        <div style={{ fontSize:9, color:"#1e3a5f", fontFamily:"sans-serif", fontWeight:700,
-                          background:"#fff8", padding:"1px 6px", borderRadius:6 }}>Gate of Jannah</div>
-                      </div>
-                    )}
+          // Items earned today (completed deeds) — placed or unplaced
+          const earnedItems = GARDEN_ITEMS.filter(i => i.show && i.size > 0);
+          const placedItems = earnedItems.filter(i => gardenLayout[i.key]);
+          const unplacedItems = earnedItems.filter(i => !gardenLayout[i.key] && i.key !== "moon");
+          const isPlacingMode = pendingItem !== null && tab === "garden";
+          const isEmpty = earnedItems.length === 0;
 
-                    {/* Ground layer */}
-                    <div style={{ position:"absolute", bottom:0, left:0, right:0, height:"48%",
-                      background:"linear-gradient(180deg,#86efac,#4ade80)" }} />
+          function handleGardenTap(e) {
+            if (!pendingItem) return;
+            const rect = e.currentTarget.getBoundingClientRect();
+            const xPct = Math.round(((e.clientX - rect.left) / rect.width) * 100);
+            const yPct = Math.round(((e.clientY - rect.top)  / rect.height) * 100);
+            // Keep away from edges
+            const clampedX = Math.min(Math.max(xPct, 8), 92);
+            const clampedY = Math.min(Math.max(yPct, 8), 85);
+            placeItem(pendingItem.key, pendingItem.emoji, clampedX + "%", clampedY + "%");
+          }
 
-                    {/* River */}
-                    {RIVER && (
-                      <div style={{ position:"absolute", bottom:"18%", left:0, right:0, height:18,
-                        background:"linear-gradient(90deg,#93c5fd88,#60a5fa,#93c5fd88)",
-                        borderRadius:9, margin:"0 30px" }} />
-                    )}
+          return (
+            <div style={{ padding:"10px 14px 0" }}>
+              <button onClick={() => setTab("more")} style={{
+                display:"flex", alignItems:"center", gap:6, background:"none", border:"none",
+                cursor:"pointer", color:T.muted, fontSize:12, fontFamily:"sans-serif",
+                padding:"0 0 10px", marginTop:4,
+              }}>← Back</button>
 
-                    {/* Fountain */}
-                    {FOUNTAIN && (
-                      <div style={{ position:"absolute", bottom:"28%", left:"12%", fontSize:24 }}>⛲</div>
-                    )}
+              {/* Header */}
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
+                <div style={{ fontSize:9, letterSpacing:3, textTransform:"uppercase", fontWeight:700,
+                  fontFamily:"sans-serif", color:GOLD }}>Today's Garden</div>
+                <div style={{ fontSize:10, color:T.muted, fontFamily:"sans-serif" }}>
+                  {placedItems.length} placed · {unplacedItems.length} to plant
+                </div>
+              </div>
 
-                    {/* Trees row */}
-                    <div style={{ position:"absolute", bottom:"30%", left:0, right:0,
-                      display:"flex", justifyContent:"space-around", padding:"0 10px", flexWrap:"wrap" }}>
-                      {Array.from({ length: TREES }).map((_,i) => (
-                        <span key={i} style={{ fontSize: i % 3 === 0 ? 28 : 22 }}>🌳</span>
-                      ))}
-                    </div>
-
-                    {/* Flowers row */}
-                    <div style={{ position:"absolute", bottom:"12%", left:0, right:0,
-                      display:"flex", justifyContent:"space-around", padding:"0 8px", flexWrap:"wrap" }}>
-                      {Array.from({ length: FLOWERS }).map((_,i) => (
-                        <span key={i} style={{ fontSize:16 }}>
-                          {["🌸","🌺","🌼","🌻","🌹"][i % 5]}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* Stars night overlay */}
-                    <div style={{ position:"absolute", top:8, left:0, right:0,
-                      display:"flex", justifyContent:"space-around", padding:"0 20px" }}>
-                      {Array.from({ length: STARS }).map((_,i) => (
-                        <span key={i} style={{ fontSize:12, opacity:0.8 }}>⭐</span>
-                      ))}
-                    </div>
-
-                    {/* Empty state */}
-                    {TREES === 0 && FLOWERS === 0 && !GATE && (
-                      <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column",
-                        alignItems:"center", justifyContent:"center", textAlign:"center", padding:20 }}>
-                        <div style={{ fontSize:36, marginBottom:8 }}>🌱</div>
-                        <div style={{ fontSize:13, color:"#166534", fontFamily:"'Nunito',sans-serif", fontWeight:600 }}>
-                          Your garden is waiting...
-                        </div>
-                        <div style={{ fontSize:11, color:"#16a34a", fontFamily:"sans-serif", marginTop:4 }}>
-                          Complete prayers to plant trees 🌳
-                        </div>
-                      </div>
-                    )}
+              {/* Unplaced items — tap to select for placing */}
+              {unplacedItems.length > 0 && (
+                <div style={{ background: GOLD+"10", border:"1px solid "+GOLD+"33",
+                  borderRadius:12, padding:"10px 12px", marginBottom:10 }}>
+                  <div style={{ fontSize:10, color:GOLD, fontFamily:"sans-serif",
+                    fontWeight:700, marginBottom:8 }}>
+                    🌱 Tap an item to place it in your garden
                   </div>
+                  <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
+                    {unplacedItems.map(item => (
+                      <button key={item.key}
+                        onClick={() => setPendingItem({ key:item.key, emoji:item.emoji, label:item.label })}
+                        style={{
+                          padding:"6px 12px", borderRadius:10, cursor:"pointer",
+                          border:"2px solid " + (pendingItem?.key===item.key ? GOLD : T.border),
+                          background: pendingItem?.key===item.key ? GOLD+"22" : T.alt,
+                          fontSize:20, transition:"all 0.18s",
+                          transform: pendingItem?.key===item.key ? "scale(1.15)" : "scale(1)",
+                        }}>
+                        {item.emoji}
+                        <div style={{ fontSize:8, color:T.muted, fontFamily:"sans-serif",
+                          marginTop:2, textAlign:"center" }}>{item.label.split(" ")[0]}</div>
+                      </button>
+                    ))}
+                  </div>
+                  {pendingItem && (
+                    <div style={{ fontSize:10, color:GOLD, fontFamily:"sans-serif",
+                      marginTop:8, textAlign:"center", fontStyle:"italic" }}>
+                      Now tap anywhere on the garden to plant {pendingItem.emoji}
+                    </div>
+                  )}
+                </div>
+              )}
 
-                  {/* Garden legend */}
-                  <div style={{ background:T.card, borderRadius:14, border:"1px solid " + T.border, padding:"12px 14px", marginBottom:12 }}>
-                    <div style={{ fontSize:10, letterSpacing:3, textTransform:"uppercase", fontWeight:700,
-                      fontFamily:"sans-serif", color:GOLD, marginBottom:10 }}>How your garden grows</div>
-                    {[
-                      { icon:"🌳", label:"Trees", desc:"5 Fard prayers → 1 tree", count:TREES, max:12 },
-                      { icon:"🌸", label:"Flowers", desc:"3 Sunnah prayers → 1 flower", count:FLOWERS, max:15 },
-                      { icon:"⭐", label:"Stars", desc:"2 Witr nights → 1 star", count:STARS, max:10 },
-                      { icon:"💧", label:"River", desc:"7 days Quran recitation", count:RIVER?1:0, max:1 },
-                      { icon:"⛲", label:"Fountain", desc:"5 days Sadaqah", count:FOUNTAIN?1:0, max:1 },
-                      { icon:"🕊️", label:"Birds", desc:"5 Tahajjud nights", count:BIRDS?1:0, max:1 },
-                      { icon:"☀️", label:"Sun", desc:"5 Duha prayers", count:SUN?1:0, max:1 },
-                      { icon:"🕌", label:"Gate", desc:"7-day streak", count:GATE?1:0, max:1 },
-                      { icon:"🏰", label:"Palace", desc:"30-day streak", count:PALACE?1:0, max:1 },
-                    ].map(function(item) {
-                      const done = item.count > 0;
-                      return (
-                        <div key={item.label} style={{ display:"flex", alignItems:"center", gap:10,
-                          padding:"6px 0", borderBottom:"1px solid " + T.borderL, opacity: done ? 1 : 0.5 }}>
-                          <span style={{ fontSize:20, width:28, textAlign:"center" }}>{item.icon}</span>
-                          <div style={{ flex:1 }}>
-                            <div style={{ fontSize:12, fontWeight:600, color: done ? T.text : T.muted,
-                              fontFamily:"'Nunito',sans-serif" }}>{item.label}
-                              {item.max > 1 && <span style={{ color:GOLD, fontWeight:700 }}> ×{item.count}</span>}
-                            </div>
-                            <div style={{ fontSize:10, color:T.muted, fontFamily:"sans-serif" }}>{item.desc}</div>
+              {/* Garden canvas — tappable when placing */}
+              <div
+                onClick={handleGardenTap}
+                style={{ borderRadius:20, overflow:"hidden", marginBottom:12,
+                  border:"2px solid " + (isPlacingMode ? GOLD : richness > 50 ? "#6366f155" : T.border),
+                  minHeight:300, position:"relative",
+                  cursor: isPlacingMode ? "crosshair" : "default",
+                  boxShadow: isPlacingMode ? "0 0 0 3px "+GOLD+"44" : "none",
+                  transition:"box-shadow 0.2s, border-color 0.2s",
+                }}>
+
+                {/* Sky */}
+                <div style={{ position:"absolute", top:0, left:0, right:0, height:"50%", background:skyGrad }} />
+
+                {/* Ground */}
+                <div style={{ position:"absolute", bottom:0, left:0, right:0, height:"42%",
+                  background: FARD_DONE >= 3
+                    ? "linear-gradient(180deg,#86efac,#4ade80)"
+                    : FARD_DONE >= 1
+                    ? "linear-gradient(180deg,#bbf7d0,#86efac)"
+                    : "linear-gradient(180deg,#d1fae5,#a7f3d0)" }} />
+
+                {/* Quran river — spans full width if placed */}
+                {gardenLayout["quran"] && (
+                  <div style={{ position:"absolute", bottom:"28%", left:0, right:0, height:14,
+                    background:"linear-gradient(90deg,#93c5fd44,#60a5fa,#93c5fd44)",
+                    borderRadius:7 }} />
+                )}
+
+                {/* Moon always in background */}
+                {!HAS_DUHA && (
+                  <div style={{ position:"absolute", right:"8%", top:"6%", fontSize:22, opacity:0.5 }}>🌙</div>
+                )}
+
+                {/* Placed items */}
+                {Object.entries(gardenLayout).map(([key, item]) => {
+                  if (!item || key === "quran") return null;
+                  return (
+                    <div key={key} style={{
+                      position:"absolute",
+                      left:item.x, top:item.y,
+                      transform:"translate(-50%,-50%)",
+                      fontSize: key==="palace"?48:key==="gate"?38:key==="duha"?32:
+                                key.startsWith("sun")?18:22,
+                      lineHeight:1,
+                      filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.15))",
+                      transition:"all 0.4s ease",
+                      cursor:"pointer",
+                      userSelect:"none",
+                    }}
+                    title={key}
+                    onClick={function(e) {
+                      if (isPlacingMode) return; // don't remove while placing
+                      e.stopPropagation();
+                    }}>
+                      {item.emoji}
+                    </div>
+                  );
+                })}
+
+                {/* Placing hint overlay */}
+                {isPlacingMode && (
+                  <div style={{ position:"absolute", inset:0, display:"flex",
+                    alignItems:"flex-end", justifyContent:"center",
+                    paddingBottom:12, pointerEvents:"none" }}>
+                    <div style={{ background:"rgba(0,0,0,0.55)", borderRadius:20,
+                      padding:"6px 16px", fontSize:12, color:"#fff",
+                      fontFamily:"sans-serif" }}>
+                      Tap to place {pendingItem?.emoji}
+                    </div>
+                  </div>
+                )}
+
+                {/* Empty state */}
+                {isEmpty && (
+                  <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column",
+                    alignItems:"center", justifyContent:"center", textAlign:"center", padding:24 }}>
+                    <div style={{ fontSize:36, marginBottom:10 }}>🌱</div>
+                    <div style={{ fontSize:14, color:"#166534", fontFamily:"'Lora',serif",
+                      fontWeight:600, marginBottom:6 }}>Your garden awaits</div>
+                    <div style={{ fontSize:11, color:"#16a34a", fontFamily:"sans-serif", lineHeight:"1.6" }}>
+                      Complete deeds today to earn garden items<br/>
+                      then tap to place them where you like 🌳
+                    </div>
+                  </div>
+                )}
+
+                {/* Richness glow */}
+                {richness >= 80 && (
+                  <div style={{ position:"absolute", inset:0,
+                    background:"radial-gradient(ellipse at 50% 30%,#fef08a22,transparent 60%)",
+                    pointerEvents:"none" }} />
+                )}
+              </div>
+
+              {/* Garden elements — what each deed grows */}
+              <div style={{ background:T.card, borderRadius:14, border:"1px solid "+T.border,
+                padding:"12px 14px", marginBottom:12 }}>
+                <div style={{ fontSize:10, letterSpacing:3, textTransform:"uppercase", fontWeight:700,
+                  fontFamily:"sans-serif", color:GOLD, marginBottom:10 }}>What grows today</div>
+                {[
+                  { emoji:"🌳", label:"Fard Prayer Trees",   sub:"Each of the 5 daily prayers",    done:FARD_DONE,  total:5,  hadith:"Prayer is the pillar of the deen — Tirmidhi 2616" },
+                  { emoji:"🌸", label:"Sunnah Flowers",      sub:"Sunnah prayers before & after",  done:SUNNAH_DONE,total:5,  hadith:"" },
+                  { emoji:"⭐", label:"Witr Star",            sub:"Night prayer seal",              done:HAS_WITR?1:0,total:1, hadith:"Do not sleep without praying Witr — Abu Dawud 1416" },
+                  { emoji:"💧", label:"River of Quran",       sub:"Daily Quran recitation",         done:HAS_QURAN?1:0,total:1,hadith:"Recite Quran, for it will intercede — Muslim 804" },
+                  { emoji:"☀️", label:"Duha Sun",             sub:"Morning voluntary prayer",       done:HAS_DUHA?1:0,total:1, hadith:"Allah says: Son of Adam, pray 4 rak'ahs — Abu Dawud 1289" },
+                  { emoji:"🕊️", label:"Tahajjud Dove",        sub:"Night vigil prayer",             done:HAS_TAHAJJUD?1:0,total:1,hadith:"Best prayer after obligatory — Muslim 1163" },
+                  { emoji:"✨", label:"Dhikr Light",           sub:"Morning or evening adhkar",      done:HAS_ADHKAR?1:0,total:1,hadith:"SubhanAllah plants a tree in Jannah — Tirmidhi 3464" },
+                  { emoji:"⛲", label:"Sadaqah Fountain",     sub:"Daily charity",                  done:HAS_SADAQAH?1:0,total:1,hadith:"Sadaqah extinguishes sin as water extinguishes fire — Tirmidhi 614" },
+                  { emoji:"🕌", label:"Gate of Jannah",       sub:"7-day streak",                   done:GATE?1:0,  total:1,  hadith:"باب الجنة لمن داوم" },
+                  { emoji:"🏰", label:"Palace of Jannah",     sub:"30-day streak",                  done:PALACE?1:0,total:1,  hadith:"قصر في الجنة لمن صبر" },
+                ].map(function(row) {
+                  // pct used below for bar width
+                  const rowPct = row.total > 1 ? Math.round((row.done/row.total)*100) : null; // eslint-disable-line
+                  const active = row.done > 0;
+                  return (
+                    <div key={row.label} style={{ marginBottom:10, opacity: active ? 1 : 0.45 }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom: row.hadith ? 3 : 0 }}>
+                        <span style={{ fontSize:18, width:24, textAlign:"center" }}>{row.emoji}</span>
+                        <div style={{ flex:1 }}>
+                          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                            <span style={{ fontSize:12, fontWeight:600, color: active ? T.text : T.muted,
+                              fontFamily:"'Lora',serif" }}>{row.label}</span>
+                            <span style={{ fontSize:11, fontWeight:700, color: active ? "#16a34a" : T.muted,
+                              fontFamily:"sans-serif" }}>
+                              {row.total > 1 ? row.done+"/"+row.total : (active ? "✓" : "—")}
+                            </span>
                           </div>
-                          <span style={{ fontSize:12 }}>{done ? "✅" : "🔒"}</span>
+                          <div style={{ fontSize:10, color:T.muted, fontFamily:"sans-serif" }}>{row.sub}</div>
+                          {row.total > 1 && (
+                            <div style={{ height:4, background:T.borderL, borderRadius:2, marginTop:3, overflow:"hidden" }}>
+                              <div style={{ height:"100%", borderRadius:2, background:active?"#16a34a":T.border,
+                                width:(row.done/row.total*100)+"%", transition:"width 0.4s" }} />
+                            </div>
+                          )}
                         </div>
-                      );
-                    })}
-                    <div style={{ marginTop:10, padding:"10px", background:GOLD+"12",
-                      borderRadius:10, textAlign:"center" }}>
-                      <div style={{ fontSize:11, color:GOLD, fontFamily:"'Lora',serif", fontStyle:"italic" }}>
-                        "Whoever says SubhanAllah 100 times, a thousand good deeds are recorded for him"
                       </div>
-                      <div style={{ fontSize:10, color:T.muted, fontFamily:"sans-serif", marginTop:3 }}>— Sahih Muslim</div>
+                      {row.hadith !== "" && active && (
+                        <div style={{ marginLeft:32, fontSize:9, color:GOLD, fontFamily:"sans-serif",
+                          fontStyle:"italic", marginTop:1 }}>{row.hadith}</div>
+                      )}
                     </div>
-                  </div>
+                  );
+                })}
+              </div>
 
-                  {/* Today's garden additions */}
-                  <div style={{ background:T.card, borderRadius:14, border:"1px solid " + T.border, padding:"12px 14px", marginBottom:12 }}>
-                    <div style={{ fontSize:10, letterSpacing:3, textTransform:"uppercase", fontWeight:700,
-                      fontFamily:"sans-serif", color:GOLD, marginBottom:8 }}>Added today</div>
-                    {(() => {
-                      const todayH = hist[TODAY_KEY] || {};
-                      const added = [];
-                      if (["fajr_fard","dhuhr_fard","asr_fard","magh_fard","isha_fard"].some(k=>todayH[k])) added.push("🌳 Prayer trees growing");
-                      if (["fajr_sun","dhuhr_sunB","dhuhr_sunA","magh_sunA","isha_sunA"].some(k=>todayH[k])) added.push("🌸 Sunnah flowers blooming");
-                      if (todayH["witr"]) added.push("⭐ Witr star shining");
-                      if (todayH["quran_recite"]) added.push("💧 Quran river flowing");
-                      if (todayH["sadaqah_daily"]) added.push("⛲ Sadaqah fountain");
-                      if (todayH["tahajjud_pray"]) added.push("🕊️ Tahajjud birds singing");
-                      if (todayH["duha_pray"]) added.push("☀️ Duha sun glowing");
-                      return added.length > 0
-                        ? added.map((a,i) => <div key={i} style={{ fontSize:12, color:T.sub, fontFamily:"'Nunito',sans-serif", padding:"3px 0" }}>{a}</div>)
-                        : <div style={{ fontSize:12, color:T.muted, fontFamily:"sans-serif", fontStyle:"italic" }}>Complete deeds today to add to your garden</div>;
-                    })()}
+              {/* Tomorrow message */}
+              {!isEmpty && (
+                <div style={{ background:GOLD+"12", borderRadius:13, border:"1px solid "+GOLD+"33",
+                  padding:"12px 14px", textAlign:"center", marginBottom:12 }}>
+                  <div style={{ fontSize:13, color:GOLD, fontFamily:"'Amiri',serif",
+                    lineHeight:"2", direction:"rtl", marginBottom:4 }}>
+                    مَنْ عَمِلَ صَالِحًا فَلِنَفْسِهِ
                   </div>
-                </>
-              );
-            })()}
-          </div>
-        )}
+                  <div style={{ fontSize:10, color:T.muted, fontFamily:"sans-serif", fontStyle:"italic" }}>
+                    "Whoever does righteous deeds — it is for himself." — Quran 41:46
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         {/* ══ BADGES ══ */}
         {tab === "badges" && mode === "gamified" && (
           <div style={{ padding:"10px 14px 0" }}>
+              <button onClick={() => setTab("more")} style={{
+                display:"flex", alignItems:"center", gap:6, background:"none", border:"none",
+                cursor:"pointer", color:T.muted, fontSize:12, fontFamily:"sans-serif",
+                padding:"0 0 10px", marginTop:4,
+              }}>
+                ← Back
+              </button>
+
             {(() => {
               const todayPts   = Object.keys(todayChecked).filter(k=>todayChecked[k]&&DEED_POINTS[k]).reduce((s,k)=>s+(DEED_POINTS[k]||0),0);
               const totalPts   = Object.values(adultPoints).reduce((s,v)=>s+(v||0),0) + todayPts;
@@ -1967,28 +4181,1174 @@ export default function App() {
           </div>
         )}
 
-        {/* ══ DUA ══ */}
-        {tab === "dua" && (
-          <div style={{ padding:"10px 14px 0" }}>
-            <div style={{ background:T.card, borderRadius:18, border:"1px solid " + T.border, padding:"20px 16px", textAlign:"center", marginBottom:11 }}>
-              <div style={{ fontSize:9, letterSpacing:3, textTransform:"uppercase", fontFamily:"sans-serif", color:T.muted, marginBottom:14 }}>Dua of the Day</div>
-              <div style={{ fontSize:20, color:GOLD, lineHeight:"2.1", marginBottom:14, fontFamily:"'Amiri Quran','Amiri',serif", direction:"rtl", padding:"0 8px" }}>{DUA.ar}</div>
-              <div style={{ fontSize:13, color:T.sub, fontStyle:"italic", lineHeight:"1.7", marginBottom:9, fontFamily:"'Lora',serif" }}>"{DUA.en}"</div>
-              <div style={{ fontSize:10, color:T.muted, fontFamily:"sans-serif" }}>— {DUA.src}</div>
+        {/* ══ MUHASABA ══ */}
+        {tab === "muhasaba" && (
+          <div style={{ padding:"10px 14px 16px" }}>
+
+            {/* Ayah header */}
+            <div style={{ background:GOLD+"12", borderRadius:13, border:"1px solid "+GOLD+"33",
+              padding:"14px 16px", textAlign:"center", marginBottom:14 }}>
+              <div style={{ fontSize:15, color:GOLD, fontFamily:"'Amiri Quran','Amiri',serif",
+                lineHeight:"2.2", direction:"rtl", marginBottom:6 }}>
+                حَاسِبُوا أَنْفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا
+              </div>
+              <div style={{ fontSize:10, color:T.muted, fontFamily:"sans-serif", fontStyle:"italic" }}>
+                "Take account of yourselves before you are taken to account" — Umar ibn al-Khattab رضي الله عنه
+              </div>
             </div>
-            <div style={{ background:T.card, borderRadius:13, border:"1px solid " + T.border, padding:13 }}>
-              <div style={{ fontSize:10, letterSpacing:3, textTransform:"uppercase", fontWeight:700, fontFamily:"sans-serif", color:GOLD, marginBottom:9 }}>Hijri Months</div>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:4 }}>
-                {HM_EN.map(function(m, i) {
-                  const cur = hijri.month - 1 === i;
-                  return (
-                    <div key={i} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"6px 9px", borderRadius:7, background: cur ? GOLD + "18" : T.alt, border: cur ? "1px solid " + GOLD + "44" : "1px solid " + T.border }}>
-                      <span style={{ fontSize:10, color: cur ? GOLD : T.sub, fontFamily:"sans-serif", fontWeight: cur ? 700 : 400 }}>{m}</span>
-                      <span style={{ fontSize:13, color: cur ? GOLD : T.muted, fontFamily:"'Amiri',serif" }}>{HM_AR[i]}</span>
+
+            {/* Saved confirmation */}
+            {mhSaved && (
+              <div style={{ background:"#f0fdf4", border:"1px solid #bbf7d0", borderRadius:11,
+                padding:"9px 13px", marginBottom:12, display:"flex", alignItems:"center", gap:8 }}>
+                <span style={{ fontSize:16 }}>✅</span>
+                <div style={{ flex:1 }}>
+                  <div style={{ fontSize:12, fontWeight:700, color:"#16a34a", fontFamily:"sans-serif" }}>Reflection saved</div>
+                  <div style={{ fontSize:10, color:"#15803d", fontFamily:"sans-serif" }}>جزاك الله خيرًا — May Allah accept it from you</div>
+                </div>
+                <button onClick={() => setMhSaved(false)} style={{ background:"none", border:"none",
+                  color:"#86efac", cursor:"pointer", fontSize:12 }}>✏️</button>
+              </div>
+            )}
+
+            {/* Mood */}
+            <div style={{ fontSize:9, letterSpacing:3, textTransform:"uppercase", fontWeight:700,
+              fontFamily:"sans-serif", color:GOLD, marginBottom:8 }}>How was your heart today?</div>
+            <div style={{ display:"flex", gap:6, marginBottom:14 }}>
+              {[
+                { id:"excellent", en:"Excellent", icon:"🌟", color:"#16a34a" },
+                { id:"good",      en:"Good",      icon:"😊", color:"#2563eb" },
+                { id:"okay",      en:"Okay",      icon:"😐", color:"#d97706" },
+                { id:"hard",      en:"Hard",      icon:"😔", color:"#7c3aed" },
+                { id:"struggling",en:"Struggling",icon:"🤲", color:"#dc2626" },
+              ].map(m => {
+                const active = mhMood === m.id;
+                return (
+                  <button key={m.id} onClick={() => { setMhMood(m.id); setMhSaved(false); }} style={{
+                    flex:1, padding:"9px 3px", borderRadius:10,
+                    border:"2px solid " + (active ? m.color : T.border),
+                    background: active ? m.color+"18" : T.card,
+                    cursor:"pointer", textAlign:"center", transition:"all 0.18s",
+                    transform: active ? "scale(1.06)" : "scale(1)",
+                  }}>
+                    <div style={{ fontSize:18, marginBottom:2 }}>{m.icon}</div>
+                    <div style={{ fontSize:8, color: active ? m.color : T.muted,
+                      fontFamily:"sans-serif", fontWeight: active ? 700 : 400 }}>{m.en}</div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Reflection prompts */}
+            {[
+              { key:"good",     icon:"✅", label:"What did I do well today?",         val:mhGood,     set:setMhGood },
+              { key:"improve",  icon:"💭", label:"What can I improve tomorrow?",      val:mhImprove,  set:setMhImprove },
+              { key:"grateful", icon:"🤲", label:"What am I grateful for today?",     val:mhGrateful, set:setMhGrateful },
+            ].map(p => (
+              <div key={p.key} style={{ marginBottom:12 }}>
+                <div style={{ fontSize:12, fontWeight:600, color:T.sub,
+                  fontFamily:"'Lora',serif", marginBottom:6 }}>{p.icon} {p.label}</div>
+                <textarea
+                  value={p.val}
+                  onChange={e => { p.set(e.target.value); setMhSaved(false); }}
+                  rows={2}
+                  placeholder="Write here..."
+                  style={{ width:"100%", padding:"10px 12px",
+                    border:"1px solid " + T.border, borderRadius:10,
+                    background:T.alt, color:T.text, fontSize:13,
+                    resize:"none", outline:"none",
+                    fontFamily:"'Lora',serif", lineHeight:"1.6",
+                    boxSizing:"border-box",
+                    transition:"border 0.2s",
+                  }}
+                  onFocus={e => e.target.style.borderColor = GOLD}
+                  onBlur={e => e.target.style.borderColor = T.border}
+                />
+              </div>
+            ))}
+
+            {/* Istighfar checkbox */}
+            <button onClick={() => { setMhIstighfar(!mhIstighfar); setMhSaved(false); }} style={{
+              display:"flex", alignItems:"center", gap:12, width:"100%",
+              padding:"12px 14px", marginBottom:16,
+              background: mhIstighfar ? "#fef9c3" : T.card,
+              border:"1px solid " + (mhIstighfar ? "#fde68a" : T.border),
+              borderRadius:12, cursor:"pointer", textAlign:"left", transition:"all 0.18s",
+            }}>
+              <div style={{ width:24, height:24, borderRadius:7, flexShrink:0,
+                background: mhIstighfar ? "#f59e0b" : "transparent",
+                border:"2px solid " + (mhIstighfar ? "#f59e0b" : T.border),
+                display:"flex", alignItems:"center", justifyContent:"center",
+                fontSize:13, color:"#fff", transition:"all 0.18s" }}>
+                {mhIstighfar ? "✓" : ""}
+              </div>
+              <div style={{ flex:1 }}>
+                <div style={{ fontSize:13, fontWeight:600, color: mhIstighfar ? "#92400e" : T.text,
+                  fontFamily:"'Lora',serif" }}>I made Istighfar today 🤲</div>
+                <div style={{ fontSize:11, color:T.muted, fontFamily:"'Amiri',serif", marginTop:2 }}>
+                  أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ
+                </div>
+              </div>
+            </button>
+
+            {/* Save button */}
+            <button onClick={saveMuhasaba} disabled={!mhMood} style={{
+              width:"100%", padding:"13px",
+              background: mhMood ? GOLD : T.borderL,
+              border:"none", borderRadius:13,
+              color: mhMood ? "#fff" : T.muted,
+              cursor: mhMood ? "pointer" : "not-allowed",
+              fontSize:14, fontWeight:700, fontFamily:"'Lora',serif",
+              transition:"all 0.18s",
+              boxShadow: mhMood ? "0 3px 10px "+GOLD+"44" : "none",
+            }}>
+              {mhSaved ? "✓ Saved" : "Save Reflection"}
+            </button>
+            {!mhMood && (
+              <div style={{ textAlign:"center", fontSize:10, color:T.muted,
+                fontFamily:"sans-serif", marginTop:6 }}>Select your mood to save</div>
+            )}
+
+          </div>
+        )}
+
+        {/* ══ METRICS ══ */}
+        {tab === "metrics" && (() => {
+          // ── Compute real metrics from history ──────────────────────────────
+          // Last 7 days (most recent = today)
+          const last7 = Array.from({length:7}, (_,i) => addDays(TODAY, -(6-i)));
+          
+          
+
+          function dayPct(d) {
+            const k = dateStr(d);
+            const h = k === TODAY_KEY ? todayChecked : (hist[k] || {});
+            return FARD_IDS.length ? Math.round((FARD_IDS.filter(id => h[id]).length / FARD_IDS.length) * 100) : 0;
+          }
+
+          const weekData  = last7.map(d => dayPct(d));
+          const weekAvg   = Math.round(weekData.reduce((a,b)=>a+b,0)/weekData.length);
+          const todayPctM = dayPct(TODAY);
+
+          // Best streak
+          let bestS = 0, curS = 0, bd = addDays(TODAY, -1);
+          for (let i=0;i<365;i++) {
+            const h = hist[dateStr(bd)] || {};
+            if (FARD_IDS.filter(id=>h[id]).length >= FARD_IDS.length) { curS++; if (curS>bestS) bestS=curS; }
+            else curS=0;
+            bd = addDays(bd,-1);
+          }
+          bestS = Math.max(bestS, streak);
+
+          // 30-day prayer consistency per prayer
+          const last30 = Array.from({length:30}, (_,i) => addDays(TODAY, -i));
+          const prayerConsistency = PRAYERS.map(prayer => {
+            const fardRows = prayer.rows.filter(r => r.type === "F");
+            if (!fardRows.length) return null;
+            const days = last30.filter(d => {
+              const h = dateStr(d)===TODAY_KEY ? todayChecked : (hist[dateStr(d)]||{});
+              return fardRows.every(r => h[r.id]);
+            }).length;
+            return { name:prayer.label, ar:prayer.ar, icon:prayer.icon, pct: Math.round((days/30)*100) };
+          }).filter(Boolean);
+
+          // Monthly avg (last 30 days)
+          const monthlyAvg = Math.round(last30.reduce((s,d) => s + dayPct(d), 0) / 30);
+
+          // Points this week (Journey)
+          const weekPoints = last7.map(d => adultPoints[dateStr(d)] || 0);
+
+          // Heatmap color
+          function heatCol(p) {
+            if (p===0)  return T.borderL;
+            if (p<40)   return "#fde68a";
+            if (p<70)   return "#fbbf24";
+            if (p<90)   return GOLD;
+            return "#16a34a";
+          }
+
+          // Trend line SVG
+          const SVG_W = 300, SVG_H = 64;
+          const tPts = weekData.map((v,i) => ({
+            x: (i/(weekData.length-1))*(SVG_W-20)+10,
+            y: SVG_H - (v/100)*(SVG_H-12) - 6,
+          }));
+          const tPath = tPts.map((p,i)=>(i===0?`M${p.x},${p.y}`:`L${p.x},${p.y}`)).join(" ");
+          const aPath = `${tPath} L${tPts[tPts.length-1].x},${SVG_H} L${tPts[0].x},${SVG_H} Z`;
+          const DAYS_SHORT = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+
+
+          return (
+            <div style={{ padding:"10px 14px 16px" }}>
+
+              {/* ── Stat cards ── */}
+              <div style={{ fontSize:9, letterSpacing:3, textTransform:"uppercase", fontWeight:700, fontFamily:"sans-serif", color:GOLD, marginBottom:10 }}>Overview</div>
+              <div style={{ display:"flex", gap:8, marginBottom:12 }}>
+                {[
+                  { icon:"🔥", val:streak,        label:"Streak",      col:GOLD },
+                  { icon:"✅", val:todayPctM+"%",  label:"Today",       col:todayPctM>79?"#16a34a":GOLD },
+                  { icon:"🏆", val:bestS,          label:"Best",        col:T.sub },
+                  { icon:"🕌", val:jamaahStreak,   label:"Jamaah",      col:"#0369a1" },
+                ].map(s => (
+                  <div key={s.label} style={{ flex:1, background:T.card, borderRadius:13, border:"1px solid "+T.border, padding:"12px 8px", textAlign:"center" }}>
+                    <div style={{ fontSize:20, marginBottom:3 }}>{s.icon}</div>
+                    <div style={{ fontSize:22, fontWeight:800, color:s.col, fontFamily:"sans-serif", lineHeight:1, marginBottom:3 }}>{s.val}</div>
+                    <div style={{ fontSize:8, color:T.muted, fontFamily:"sans-serif", letterSpacing:1, textTransform:"uppercase" }}>{s.label}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* ── Weekly heatmap ── */}
+              <div style={{ fontSize:9, letterSpacing:3, textTransform:"uppercase", fontWeight:700, fontFamily:"sans-serif", color:GOLD, marginBottom:10 }}>This Week</div>
+              <div style={{ background:T.card, borderRadius:13, border:"1px solid "+T.border, padding:"13px", marginBottom:14 }}>
+                <div style={{ display:"flex", gap:5, marginBottom:7 }}>
+                  {weekData.map((p,i) => {
+                    const isToday = i===6;
+                    return (
+                      <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:4 }}>
+                        <div style={{ width:"100%", aspectRatio:"1", borderRadius:7,
+                          background:heatCol(p),
+                          border: isToday ? "2px solid "+GOLD : "2px solid transparent",
+                          display:"flex", alignItems:"center", justifyContent:"center",
+                          fontSize:7, fontWeight:700, fontFamily:"sans-serif",
+                          color:p>=70?"#fff":"#92400e",
+                          boxShadow:isToday?"0 0 0 2px "+GOLD+"44":"none",
+                        }}>
+                          {p>0?p+"%":""}
+                        </div>
+                        <div style={{ fontSize:7, color:isToday?GOLD:T.muted, fontFamily:"sans-serif", fontWeight:isToday?700:400 }}>
+                          {DAYS_SHORT[i]}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div style={{ display:"flex", alignItems:"center", gap:5, justifyContent:"flex-end" }}>
+                  <span style={{ fontSize:7, color:T.muted, fontFamily:"sans-serif" }}>Less</span>
+                  {[T.borderL,"#fde68a","#fbbf24",GOLD,"#16a34a"].map((c,i) => (
+                    <div key={i} style={{ width:9, height:9, borderRadius:2, background:c }} />
+                  ))}
+                  <span style={{ fontSize:7, color:T.muted, fontFamily:"sans-serif" }}>More</span>
+                </div>
+              </div>
+
+              {/* ── 7-day trend ── */}
+              <div style={{ fontSize:9, letterSpacing:3, textTransform:"uppercase", fontWeight:700, fontFamily:"sans-serif", color:GOLD, marginBottom:10 }}>7-Day Trend</div>
+              <div style={{ background:T.card, borderRadius:13, border:"1px solid "+T.border, padding:"13px", marginBottom:14 }}>
+                <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
+                  <span style={{ fontSize:11, color:T.sub, fontFamily:"sans-serif" }}>Daily completion %</span>
+                  <span style={{ fontSize:11, color:GOLD, fontWeight:700, fontFamily:"sans-serif" }}>avg {weekAvg}%</span>
+                </div>
+                <svg width="100%" viewBox={`0 0 ${SVG_W} ${SVG_H+10}`} style={{ overflow:"visible" }}>
+                  {[25,50,75,100].map(v => {
+                    const y = SVG_H-(v/100)*(SVG_H-12)-6;
+                    return (
+                      <g key={v}>
+                        <line x1="10" y1={y} x2={SVG_W-10} y2={y} stroke={T.borderL} strokeWidth="1" strokeDasharray="3,3"/>
+                        <text x="6" y={y+3} fontSize="7" fill={T.muted} textAnchor="middle" fontFamily="sans-serif">{v}</text>
+                      </g>
+                    );
+                  })}
+                  <path d={aPath} fill={GOLD+"18"}/>
+                  <path d={tPath} fill="none" stroke={GOLD} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  {tPts.map((p,i) => (
+                    <g key={i}>
+                      <circle cx={p.x} cy={p.y} r={i===6?5:3.5} fill={weekData[i]===100?"#16a34a":GOLD} stroke="#fff" strokeWidth="1.5"/>
+                      {i===6 && <text x={p.x} y={p.y-9} fontSize="8" fill={GOLD} textAnchor="middle" fontFamily="sans-serif" fontWeight="700">{weekData[i]}%</text>}
+                    </g>
+                  ))}
+                </svg>
+                <div style={{ display:"flex", marginTop:4 }}>
+                  {DAYS_SHORT.map((d,i) => (
+                    <div key={i} style={{ flex:1, textAlign:"center", fontSize:7, color:i===6?GOLD:T.muted, fontFamily:"sans-serif", fontWeight:i===6?700:400 }}>{d}</div>
+                  ))}
+                </div>
+              </div>
+
+              {/* ── Prayer consistency ── */}
+              <div style={{ fontSize:9, letterSpacing:3, textTransform:"uppercase", fontWeight:700, fontFamily:"sans-serif", color:GOLD, marginBottom:10 }}>Prayer Consistency (30 days)</div>
+              <div style={{ background:T.card, borderRadius:13, border:"1px solid "+T.border, padding:"13px", marginBottom:14 }}>
+                {prayerConsistency.map((p,i) => (
+                  <div key={p.name} style={{ marginBottom: i<prayerConsistency.length-1?11:0 }}>
+                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:5 }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                        <span style={{ fontSize:13 }}>{p.icon}</span>
+                        <span style={{ fontSize:13, fontWeight:600, color:T.text, fontFamily:"'Lora',serif" }}>{p.name}</span>
+                        <span style={{ fontSize:11, color:T.muted, fontFamily:"'Amiri',serif" }}>{p.ar}</span>
+                      </div>
+                      <span style={{ fontSize:12, fontWeight:700, fontFamily:"sans-serif", color:p.pct>=90?"#16a34a":p.pct>=70?GOLD:"#ef4444" }}>{p.pct}%</span>
                     </div>
+                    <div style={{ height:7, background:T.alt, borderRadius:4, overflow:"hidden" }}>
+                      <div style={{ height:"100%", borderRadius:4, width:p.pct+"%",
+                        background:p.pct>=90?"#16a34a":p.pct>=70?GOLD:"#f59e0b",
+                        transition:"width 0.4s ease" }} />
+                    </div>
+                  </div>
+                ))}
+                <div style={{ marginTop:11, paddingTop:9, borderTop:"1px solid "+T.borderL, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                  <span style={{ fontSize:10, color:T.muted, fontFamily:"sans-serif" }}>Monthly average</span>
+                  <span style={{ fontSize:13, fontWeight:700, color:GOLD, fontFamily:"sans-serif" }}>{monthlyAvg}%</span>
+                </div>
+              </div>
+
+              {/* ── Journey points ── */}
+              {mode === "gamified" && (
+                <>
+                  <div style={{ fontSize:9, letterSpacing:3, textTransform:"uppercase", fontWeight:700, fontFamily:"sans-serif", color:GOLD, marginBottom:10 }}>Points This Week</div>
+                  <div style={{ background:T.card, borderRadius:13, border:"1px solid "+T.border, padding:"13px", marginBottom:14 }}>
+                    <div style={{ display:"flex", justifyContent:"space-between", marginBottom:10 }}>
+                      <span style={{ fontSize:11, color:T.sub, fontFamily:"sans-serif" }}>Daily points</span>
+                      <span style={{ fontSize:11, color:GOLD, fontWeight:700, fontFamily:"sans-serif" }}>{weekPoints.reduce((a,b)=>a+b,0)} total</span>
+                    </div>
+                    <div style={{ display:"flex", alignItems:"flex-end", gap:5, height:60 }}>
+                      {weekPoints.map((pts,i) => {
+                        const maxP = Math.max(...weekPoints, 1);
+                        const h = Math.max(5, Math.round((pts/maxP)*54));
+                        const isToday = i===6;
+                        return (
+                          <div key={i} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:2, height:"100%", justifyContent:"flex-end" }}>
+                            <div style={{ fontSize:7, color:isToday?GOLD:T.muted, fontFamily:"sans-serif", fontWeight:700 }}>{isToday&&pts?pts:""}</div>
+                            <div style={{ width:"100%", borderRadius:"3px 3px 0 0", height:h,
+                              background:isToday?"linear-gradient(to top,"+GOLD+","+GOLD+"aa)":T.borderL,
+                              boxShadow:isToday?"0 0 6px "+GOLD+"66":"none",
+                              transition:"height 0.3s" }} />
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div style={{ display:"flex", marginTop:4 }}>
+                      {DAYS_SHORT.map((d,i) => (
+                        <div key={i} style={{ flex:1, textAlign:"center", fontSize:7, color:i===6?GOLD:T.muted, fontFamily:"sans-serif", fontWeight:i===6?700:400 }}>{d}</div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* ── Prayer gap analysis ── */}
+              <div style={{ fontSize:9, letterSpacing:3, textTransform:"uppercase", fontWeight:700, fontFamily:"sans-serif", color:GOLD, marginBottom:10 }}>Prayer Consistency (30 days)</div>
+              <div style={{ background:T.card, borderRadius:13, border:"1px solid "+T.border, padding:"13px", marginBottom:14 }}>
+                {(() => {
+                  const last30 = Array.from({length:30}, (_,i) => addDays(TODAY, -i));
+                  const gapData = PRAYERS.map(prayer => {
+                    const fardRows = prayer.rows.filter(r => r.type === "F");
+                    if (!fardRows.length) return null;
+                    const days = last30.filter(d => {
+                      const h = dateStr(d)===TODAY_KEY ? todayChecked : (hist[dateStr(d)]||{});
+                      return fardRows.every(r => h[r.id]);
+                    }).length;
+                    return { name:prayer.label, ar:prayer.ar, icon:prayer.icon, pct:Math.round((days/30)*100), days };
+                  }).filter(Boolean);
+                  const weakest = [...gapData].sort((a,b)=>a.pct-b.pct)[0];
+                  return (
+                    <>
+                      {gapData.map((p,i) => (
+                        <div key={p.name} style={{ marginBottom:i<gapData.length-1?11:0 }}>
+                          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:5 }}>
+                            <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                              <span style={{ fontSize:13 }}>{p.icon}</span>
+                              <span style={{ fontSize:13, fontWeight:600, color:T.text, fontFamily:"'Lora',serif" }}>{p.name}</span>
+                              <span style={{ fontSize:11, color:T.muted, fontFamily:"'Amiri',serif" }}>{p.ar}</span>
+                            </div>
+                            <span style={{ fontSize:12, fontWeight:700, fontFamily:"sans-serif",
+                              color:p.pct>=90?"#16a34a":p.pct>=70?GOLD:"#ef4444" }}>{p.pct}%</span>
+                          </div>
+                          <div style={{ height:7, background:T.alt, borderRadius:4, overflow:"hidden" }}>
+                            <div style={{ height:"100%", borderRadius:4, width:p.pct+"%",
+                              background:p.pct>=90?"#16a34a":p.pct>=70?GOLD:"#f59e0b",
+                              transition:"width 0.4s ease" }} />
+                          </div>
+                        </div>
+                      ))}
+                      {weakest && weakest.pct < 80 && (
+                        <div style={{ marginTop:11, padding:"9px 11px", background:"#fef2f2",
+                          borderRadius:8, border:"1px solid #fecaca", fontSize:11,
+                          color:"#dc2626", fontFamily:"sans-serif" }}>
+                          💡 Focus area: <strong>{weakest.name}</strong> — completed {weakest.days}/30 days ({weakest.pct}%)
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
+
+              {/* ── Monthly report ── */}
+              {(() => {
+                const last30 = Array.from({length:30}, (_,i) => addDays(TODAY,-i));
+                const pcts   = last30.map(d => {
+                  const h = dateStr(d)===TODAY_KEY?todayChecked:(hist[dateStr(d)]||{});
+                  return FARD_IDS.length?Math.round((FARD_IDS.filter(id=>h[id]).length/FARD_IDS.length)*100):0;
+                });
+                const avg    = Math.round(pcts.reduce((a,b)=>a+b,0)/pcts.length);
+                const best   = Math.max(...pcts);
+                const bestIdx= pcts.indexOf(best);
+                const bestDay= addDays(TODAY,-bestIdx);
+                const perfect= pcts.filter(p=>p===100).length;
+                const missed = pcts.filter(p=>p===0).length;
+                return (
+                  <>
+                    <div style={{ fontSize:9, letterSpacing:3, textTransform:"uppercase", fontWeight:700, fontFamily:"sans-serif", color:GOLD, marginBottom:10 }}>30-Day Report</div>
+                    <div style={{ background:T.card, borderRadius:13, border:"1px solid "+T.border, padding:"13px", marginBottom:14 }}>
+                      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, marginBottom:10 }}>
+                        {[
+                          { icon:"📊", val:avg+"%",  label:"Monthly avg",    col:avg>79?"#16a34a":GOLD },
+                          { icon:"⭐", val:perfect,   label:"Perfect days",   col:GOLD },
+                          { icon:"🔥", val:streak,    label:"Current streak", col:GOLD },
+                          { icon:"📅", val:missed,    label:"Missed days",    col:missed>5?"#ef4444":T.muted },
+                        ].map(s => (
+                          <div key={s.label} style={{ background:T.alt, borderRadius:10,
+                            padding:"10px", textAlign:"center",
+                            border:"1px solid "+T.border }}>
+                            <div style={{ fontSize:16, marginBottom:2 }}>{s.icon}</div>
+                            <div style={{ fontSize:18, fontWeight:800, color:s.col,
+                              fontFamily:"sans-serif", lineHeight:1, marginBottom:2 }}>{s.val}</div>
+                            <div style={{ fontSize:8, color:T.muted, fontFamily:"sans-serif",
+                              letterSpacing:1, textTransform:"uppercase" }}>{s.label}</div>
+                          </div>
+                        ))}
+                      </div>
+                      {best === 100 && (
+                        <div style={{ padding:"8px 10px", background:GOLD+"10",
+                          borderRadius:8, border:"1px solid "+GOLD+"22",
+                          fontSize:10, color:GOLD, fontFamily:"sans-serif", textAlign:"center" }}>
+                          🌟 Best day: {DAYS_LONG[bestDay.getDay()]}, {MON_SHORT[bestDay.getMonth()]} {bestDay.getDate()} — 100% complete
+                        </div>
+                      )}
+                    </div>
+                  </>
+                );
+              })()}
+
+              {/* ── Export data ── */}
+              <div style={{ fontSize:9, letterSpacing:3, textTransform:"uppercase", fontWeight:700, fontFamily:"sans-serif", color:GOLD, marginBottom:10 }}>Your Data</div>
+              <div style={{ background:T.card, borderRadius:13, border:"1px solid "+T.border, padding:"13px", marginBottom:14 }}>
+                <div style={{ fontSize:11, color:T.muted, fontFamily:"sans-serif", marginBottom:10, lineHeight:"1.6" }}>
+                  Your deeds are stored locally on your device. Export a backup anytime.
+                </div>
+                <button onClick={() => {
+                  try {
+                    const exportData = {
+                      exported: new Date().toISOString(),
+                      app: "Yawm يَوْم",
+                      history: mode==="gamified" ? journeyHist : classicHist,
+                      notes: mode==="gamified" ? journeyNotes : classicNotes,
+                      mode, gender, streak,
+                    };
+                    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type:"application/json" });
+                    const url  = URL.createObjectURL(blob);
+                    const a    = document.createElement("a");
+                    a.href = url;
+                    a.download = "yawm-export-"+TODAY_KEY+".json";
+                    a.click();
+                    URL.revokeObjectURL(url);
+                  } catch(e) { alert("Export failed. Please try again."); }
+                }} style={{ display:"flex", alignItems:"center", gap:10, width:"100%",
+                  padding:"11px 12px", background:T.alt, border:"1px solid "+T.border,
+                  borderRadius:10, cursor:"pointer", textAlign:"left" }}>
+                  <span style={{ fontSize:18 }}>💾</span>
+                  <div style={{ flex:1 }}>
+                    <div style={{ fontSize:13, fontWeight:700, color:T.text, fontFamily:"'Lora',serif" }}>Export my data</div>
+                    <div style={{ fontSize:10, color:T.muted, fontFamily:"sans-serif", marginTop:1 }}>Download as JSON · Includes all history and notes</div>
+                  </div>
+                  <span style={{ fontSize:14, color:T.muted }}>↓</span>
+                </button>
+              </div>
+
+              {/* ── Prayer gap analysis ── */}
+              <div style={{ fontSize:9, letterSpacing:3, textTransform:"uppercase", fontWeight:700, fontFamily:"sans-serif", color:GOLD, marginBottom:10 }}>Prayer Focus</div>
+              <div style={{ background:T.card, borderRadius:13, border:"1px solid "+T.border, padding:"13px", marginBottom:14 }}>
+                {(() => {
+                  const last30 = Array.from({length:30}, (_,i) => addDays(TODAY,-i));
+                  const gapData = PRAYERS.map(prayer => {
+                    const fardRows = prayer.rows.filter(r=>r.type==="F");
+                    if (!fardRows.length) return null;
+                    const days = last30.filter(d => {
+                      const h = dateStr(d)===TODAY_KEY?todayChecked:(hist[dateStr(d)]||{});
+                      return fardRows.every(r=>h[r.id]);
+                    }).length;
+                    return { name:prayer.label, ar:prayer.ar, icon:prayer.icon, pct:Math.round((days/30)*100), days };
+                  }).filter(Boolean);
+                  const weakest = [...gapData].sort((a,b)=>a.pct-b.pct)[0];
+                  return (
+                    <>
+                      {gapData.map((p,i) => (
+                        <div key={p.name} style={{ marginBottom:i<gapData.length-1?11:0 }}>
+                          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:5 }}>
+                            <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                              <span style={{ fontSize:13 }}>{p.icon}</span>
+                              <span style={{ fontSize:13, fontWeight:600, color:T.text, fontFamily:"'Lora',serif" }}>{p.name}</span>
+                              <span style={{ fontSize:11, color:T.muted, fontFamily:"'Amiri',serif" }}>{p.ar}</span>
+                            </div>
+                            <span style={{ fontSize:12, fontWeight:700, fontFamily:"sans-serif", color:p.pct>=90?"#16a34a":p.pct>=70?GOLD:"#ef4444" }}>{p.pct}%</span>
+                          </div>
+                          <div style={{ height:7, background:T.alt, borderRadius:4, overflow:"hidden" }}>
+                            <div style={{ height:"100%", borderRadius:4, width:p.pct+"%", background:p.pct>=90?"#16a34a":p.pct>=70?GOLD:"#f59e0b", transition:"width 0.4s" }} />
+                          </div>
+                        </div>
+                      ))}
+                      {weakest && weakest.pct < 80 && (
+                        <div style={{ marginTop:11, padding:"9px 11px", background:"#fef2f2", borderRadius:8, border:"1px solid #fecaca", fontSize:11, color:"#dc2626", fontFamily:"sans-serif" }}>
+                          💡 Focus: <strong>{weakest.name}</strong> — {weakest.days}/30 days ({weakest.pct}%)
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
+
+              {/* ── Monthly report ── */}
+              {(() => {
+                const last30 = Array.from({length:30},(_,i)=>addDays(TODAY,-i));
+                const pcts = last30.map(d => { const h=dateStr(d)===TODAY_KEY?todayChecked:(hist[dateStr(d)]||{}); return FARD_IDS.length?Math.round((FARD_IDS.filter(id=>h[id]).length/FARD_IDS.length)*100):0; });
+                const avg=Math.round(pcts.reduce((a,b)=>a+b,0)/pcts.length);
+                const best=Math.max(...pcts); const bestIdx=pcts.indexOf(best);
+                const bestDay=addDays(TODAY,-bestIdx);
+                const perfect=pcts.filter(p=>p===100).length;
+                const missed=pcts.filter(p=>p===0).length;
+                return (<>
+                  <div style={{ fontSize:9, letterSpacing:3, textTransform:"uppercase", fontWeight:700, fontFamily:"sans-serif", color:GOLD, marginBottom:10 }}>30-Day Report</div>
+                  <div style={{ background:T.card, borderRadius:13, border:"1px solid "+T.border, padding:"13px", marginBottom:14 }}>
+                    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, marginBottom:perfect>0?10:0 }}>
+                      {[
+                        { icon:"📊", val:avg+"%", label:"Monthly avg", col:avg>79?"#16a34a":GOLD },
+                        { icon:"⭐", val:perfect,  label:"Perfect days", col:GOLD },
+                        { icon:"🔥", val:streak,   label:"Current streak", col:GOLD },
+                        { icon:"📅", val:missed,   label:"Missed days", col:missed>5?"#ef4444":T.muted },
+                      ].map(s => (
+                        <div key={s.label} style={{ background:T.alt, borderRadius:10, padding:"10px", textAlign:"center", border:"1px solid "+T.border }}>
+                          <div style={{ fontSize:16, marginBottom:2 }}>{s.icon}</div>
+                          <div style={{ fontSize:18, fontWeight:800, color:s.col, fontFamily:"sans-serif", lineHeight:1, marginBottom:2 }}>{s.val}</div>
+                          <div style={{ fontSize:8, color:T.muted, fontFamily:"sans-serif", letterSpacing:1, textTransform:"uppercase" }}>{s.label}</div>
+                        </div>
+                      ))}
+                    </div>
+                    {best===100 && <div style={{ padding:"8px 10px", background:GOLD+"10", borderRadius:8, border:"1px solid "+GOLD+"22", fontSize:10, color:GOLD, fontFamily:"sans-serif", textAlign:"center" }}>🌟 Best: {DAYS_LONG[bestDay.getDay()]}, {MON_SHORT[bestDay.getMonth()]} {bestDay.getDate()} — perfect day</div>}
+                  </div>
+                </>);
+              })()}
+
+              {/* ── Export data ── */}
+              <div style={{ fontSize:9, letterSpacing:3, textTransform:"uppercase", fontWeight:700, fontFamily:"sans-serif", color:GOLD, marginBottom:10 }}>Your Data</div>
+              <div style={{ background:T.card, borderRadius:13, border:"1px solid "+T.border, padding:"13px", marginBottom:14 }}>
+                <div style={{ fontSize:11, color:T.muted, fontFamily:"sans-serif", marginBottom:10, lineHeight:"1.6" }}>Your deeds are stored locally. Export a backup anytime.</div>
+                <button onClick={() => {
+                  try {
+                    const blob = new Blob([JSON.stringify({ exported:new Date().toISOString(), app:"Yawm يَوْم", history:mode==="gamified"?journeyHist:classicHist, notes:mode==="gamified"?journeyNotes:classicNotes, mode, gender, streak }, null, 2)], { type:"application/json" });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a"); a.href=url; a.download="yawm-export-"+TODAY_KEY+".json"; a.click();
+                    URL.revokeObjectURL(url);
+                  } catch(e) { alert("Export failed."); }
+                }} style={{ display:"flex", alignItems:"center", gap:10, width:"100%", padding:"11px 12px", background:T.alt, border:"1px solid "+T.border, borderRadius:10, cursor:"pointer", textAlign:"left" }}>
+                  <span style={{ fontSize:18 }}>💾</span>
+                  <div style={{ flex:1 }}>
+                    <div style={{ fontSize:13, fontWeight:700, color:T.text, fontFamily:"'Lora',serif" }}>Export my data</div>
+                    <div style={{ fontSize:10, color:T.muted, fontFamily:"sans-serif", marginTop:1 }}>Download JSON · All history and notes</div>
+                  </div>
+                  <span style={{ fontSize:14, color:T.muted }}>↓</span>
+                </button>
+                {/* Import/restore */}
+                <div style={{ marginTop:8 }}>
+                  <label style={{ display:"flex", alignItems:"center", gap:10, width:"100%",
+                    padding:"11px 12px", background:T.alt, border:"1px solid "+T.border,
+                    borderRadius:10, cursor:"pointer", textAlign:"left" }}>
+                    <span style={{ fontSize:18 }}>📂</span>
+                    <div style={{ flex:1 }}>
+                      <div style={{ fontSize:13, fontWeight:700, color:T.text, fontFamily:"'Lora',serif" }}>Restore from backup</div>
+                      <div style={{ fontSize:10, color:T.muted, fontFamily:"sans-serif", marginTop:1 }}>Import a previously exported JSON file</div>
+                    </div>
+                    <span style={{ fontSize:14, color:T.muted }}>↑</span>
+                    <input type="file" accept=".json" style={{ display:"none" }} onChange={function(e) {
+                      const file = e.target.files[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = function(ev) {
+                        try {
+                          const data = JSON.parse(ev.target.result);
+                          if (!data.history || data.app !== "Yawm يَوْم") {
+                            alert("Invalid backup file. Please use a Yawm export.");
+                            return;
+                          }
+                          if (!window.confirm("This will replace your current history. Are you sure?")) return;
+                          if (data.mode === "gamified") {
+                            setJourneyHist(data.history);
+                            save("yawm_hist_journey", data.history);
+                            if (data.notes) { setJourneyNotes(data.notes); save("yawm_notes_journey", data.notes); }
+                          } else {
+                            setClassicHist(data.history);
+                            save("yawm_hist_classic", data.history);
+                            if (data.notes) { setClassicNotes(data.notes); save("yawm_notes_classic", data.notes); }
+                          }
+                          alert("✅ Restore successful! " + Object.keys(data.history).length + " days imported.");
+                        } catch(err) {
+                          alert("Failed to read file. Make sure it is a valid Yawm backup.");
+                        }
+                      };
+                      reader.readAsText(file);
+                      e.target.value = "";
+                    }} />
+                  </label>
+                </div>
+              </div>
+
+              {/* ── Ayah footer ── */}
+              <div style={{ background:T.alt, borderRadius:13, border:"1px solid "+GOLD+"33", padding:"14px 16px", textAlign:"center" }}>
+                <div style={{ fontSize:15, color:GOLD, fontFamily:"'Amiri Quran','Amiri',serif", lineHeight:"2.2", direction:"rtl", marginBottom:6 }}>
+                  وَمَا تُقَدِّمُوا لِأَنفُسِكُم مِّنْ خَيْرٍ تَجِدُوهُ عِندَ اللَّهِ
+                </div>
+                <div style={{ fontSize:10, color:T.muted, fontFamily:"sans-serif", fontStyle:"italic" }}>
+                  "Whatever good you put forward for yourselves — you will find it with Allah." — 2:110
+                </div>
+              </div>
+
+            </div>
+          );
+        })()}
+
+        {/* ══ MORE ══ */}
+        {tab === "more" && (
+          <div style={{ padding:"10px 14px 0" }}>
+            <div style={{ fontSize:10, letterSpacing:3, textTransform:"uppercase", fontWeight:700,
+              fontFamily:"sans-serif", color:GOLD, marginBottom:12 }}>More</div>
+
+            {/* Grid of tiles */}
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:12 }}>
+              {[
+                { key:"times",    icon:"🕐", label:"Prayer Times",  desc:"Today's salah times" },
+                { key:"calendar", icon:"📅", label:"Calendar",      desc:"Monthly overview" },
+                { key:"dua",      icon:"🤲", label:"Dua",           desc:"Daily supplications" },
+                { key:"adhkar",   icon:"📿", label:"Adhkar",        desc:"Post-prayer & more" },
+                { key:"tasbih",   icon:"📿", label:"Tasbih",        desc:"Quick dhikr counter" },
+                { key:"months",   icon:"🗓️", label:"Islamic Months",desc:"Hijri calendar" },
+                { key:"qibla",    icon:"🧭", label:"Qibla",         desc:"Direction of prayer" },
+                { key:"names99",  icon:"✨", label:"99 Names",       desc:"Asma al-Husna" },
+                ...(mode === "gamified" ? [
+                  { key:"garden",  icon:"🌳", label:"Garden",   desc:"Your Jannah garden" },
+                  { key:"badges",  icon:"🏅", label:"Badges",   desc:"Achievements earned" },
+                ] : []),
+              ].map(function(item) {
+                return (
+                  <button key={item.key} onClick={() => setTab(item.key)} style={{
+                    padding:"16px 14px", borderRadius:14,
+                    border:"1px solid " + T.border,
+                    background:T.card, cursor:"pointer", textAlign:"left",
+                    transition:"all 0.18s",
+                    boxShadow:"0 1px 4px rgba(0,0,0,0.04)",
+                  }}>
+                    <div style={{ fontSize:28, marginBottom:8 }}>{item.icon}</div>
+                    <div style={{ fontSize:13, fontWeight:700, color:T.text,
+                      fontFamily:"'Lora',serif", marginBottom:3 }}>{item.label}</div>
+                    <div style={{ fontSize:10, color:T.muted, fontFamily:"sans-serif" }}>{item.desc}</div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* ══ ADHKAR ══ */}
+        {tab === "adhkar" && (
+          <div style={{ padding:"10px 14px 0" }}>
+            {adhkarScreen === "count" && adhkarSetKey ? (
+              <AdhkarCounter
+                items={(() => {
+                  if (adhkarSetKey === "sleep") return ADHKAR_SLEEP;
+                  if (adhkarSetKey === "adhan") return ADHKAR_ADHAN;
+                  if (adhkarSetKey === "morning_evening") return ADHKAR_MORNING_EVENING;
+                  if (adhkarSetKey && adhkarSetKey.startsWith("dua_")) {
+                    const p = adhkarSetKey.replace("dua_","");
+                    const d = ADHKAR_SALAH_DUAS[p];
+                    return d ? [{ id:"salah_dua", ar:d.ar, transliteration:d.transliteration, en:d.en, count:1, src:d.src }] : ADHKAR_POST_PRAYER;
+                  }
+                  return ADHKAR_POST_PRAYER;
+                })()}
+                title={(() => {
+                  if (adhkarSetKey === "sleep") return "Before Sleep Adhkar";
+                  if (adhkarSetKey === "adhan") return "After Adhan";
+                  if (adhkarSetKey === "morning_evening") return adhkarPrayer === "Fajr" ? "Morning Adhkar" : "Evening Adhkar";
+                  if (adhkarSetKey && adhkarSetKey.startsWith("dua_")) return adhkarSetKey.replace("dua_","") + " Dua";
+                  return "Post-Prayer Adhkar";
+                })()}
+                onBack={() => setAdhkarScreen(["sleep","adhan"].includes(adhkarSetKey) ? "home" : "select")}
+                T={T} GOLD={GOLD} sessionKey={adhkarSetKey}
+              />
+            ) : adhkarScreen === "select" && adhkarPrayer ? (
+              <div>
+                <button onClick={() => setAdhkarScreen("home")} style={{ background:"none", border:"none", cursor:"pointer", color:T.muted, fontSize:12, fontFamily:"sans-serif", padding:"0 0 12px", display:"flex", alignItems:"center", gap:4 }}>← Back</button>
+                <div style={{ fontSize:15, fontWeight:700, color:T.text, marginBottom:2, fontFamily:"'Lora',serif" }}>
+                  {{"Fajr":"🌙","Dhuhr":"☀️","Asr":"🌤️","Maghrib":"🌆","Isha":"🌃"}[adhkarPrayer]} After {adhkarPrayer}
+                </div>
+                <div style={{ fontSize:11, color:T.muted, fontFamily:"sans-serif", marginBottom:14 }}>Choose which adhkar to recite</div>
+                <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+                  <button onClick={() => { setAdhkarSetKey("post_prayer"); setAdhkarScreen("count"); }}
+                    style={{ padding:"14px", background:T.card, border:"2px solid "+GOLD, borderRadius:13, cursor:"pointer", textAlign:"left", boxShadow:"0 2px 6px "+GOLD+"22" }}>
+                    <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:6 }}>
+                      <span style={{ fontSize:20 }}>📿</span>
+                      <div style={{ flex:1 }}><div style={{ fontSize:13, fontWeight:700, color:GOLD, fontFamily:"'Lora',serif" }}>Post-Prayer Adhkar</div><div style={{ fontSize:10, color:T.muted, fontFamily:"sans-serif" }}>{ADHKAR_POST_PRAYER.length} adhkar</div></div>
+                      <span style={{ color:GOLD }}>›</span>
+                    </div>
+                    <div style={{ display:"flex", gap:4, flexWrap:"wrap" }}>
+                      {ADHKAR_POST_PRAYER.map(function(it) { return (<span key={it.id} style={{ fontSize:8, padding:"2px 6px", borderRadius:5, background:GOLD+"18", color:GOLD, fontFamily:"sans-serif", fontWeight:600 }}>{it.transliteration.split(" ")[0]} ×{it.count}</span>); })}
+                    </div>
+                  </button>
+                  {["Fajr","Maghrib"].includes(adhkarPrayer) && (
+                    <button onClick={() => { setAdhkarSetKey("morning_evening"); setAdhkarScreen("count"); }}
+                      style={{ padding:"14px", background:T.card, border:"2px solid #7c3aed", borderRadius:13, cursor:"pointer", textAlign:"left" }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                        <span style={{ fontSize:20 }}>🌿</span>
+                        <div style={{ flex:1 }}><div style={{ fontSize:13, fontWeight:700, color:"#7c3aed", fontFamily:"'Lora',serif" }}>{adhkarPrayer === "Fajr" ? "Morning Adhkar" : "Evening Adhkar"}</div><div style={{ fontSize:10, color:T.muted, fontFamily:"sans-serif" }}>{ADHKAR_MORNING_EVENING.length} adhkar</div></div>
+                        <span style={{ color:"#7c3aed" }}>›</span>
+                      </div>
+                    </button>
+                  )}
+                  {ADHKAR_SALAH_DUAS[adhkarPrayer] && (
+                    <button onClick={() => { setAdhkarSetKey("dua_"+adhkarPrayer); setAdhkarScreen("count"); }}
+                      style={{ padding:"14px", background:T.card, border:"2px solid #0369a1", borderRadius:13, cursor:"pointer", textAlign:"left" }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:8 }}>
+                        <span style={{ fontSize:20 }}>🤲</span>
+                        <div style={{ flex:1 }}><div style={{ fontSize:13, fontWeight:700, color:"#0369a1", fontFamily:"'Lora',serif" }}>{adhkarPrayer} Dua</div><div style={{ fontSize:10, color:T.muted, fontFamily:"sans-serif" }}>Special dua after {adhkarPrayer}</div></div>
+                        <span style={{ color:"#0369a1" }}>›</span>
+                      </div>
+                      <div style={{ fontSize:15, color:"#0369a1", fontFamily:"'Amiri',serif", direction:"rtl", lineHeight:"1.8" }}>{ADHKAR_SALAH_DUAS[adhkarPrayer].ar}</div>
+                    </button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div>
+                <button onClick={() => setTab("more")} style={{ background:"none", border:"none", cursor:"pointer", color:T.muted, fontSize:12, fontFamily:"sans-serif", padding:"0 0 12px", display:"flex", alignItems:"center", gap:4 }}>← Back</button>
+                <div style={{ fontSize:11, color:T.muted, fontFamily:"sans-serif", letterSpacing:1, marginBottom:12, textAlign:"center" }}>Which prayer did you just complete?</div>
+                <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:14 }}>
+                  {["Fajr","Dhuhr","Asr","Maghrib","Isha"].map(function(p) { return (
+                    <button key={p} onClick={() => { setAdhkarPrayer(p); setAdhkarScreen("select"); }}
+                      style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 14px", background:T.card, border:"1px solid "+T.border, borderRadius:13, cursor:"pointer", textAlign:"left", transition:"all 0.18s" }}>
+                      <span style={{ fontSize:22 }}>{{"Fajr":"🌙","Dhuhr":"☀️","Asr":"🌤️","Maghrib":"🌆","Isha":"🌃"}[p]}</span>
+                      <div style={{ flex:1 }}>
+                        <div style={{ fontSize:14, fontWeight:700, color:T.text, fontFamily:"'Lora',serif" }}>{p}</div>
+                        <div style={{ fontSize:10, fontFamily:"sans-serif", marginTop:1 }}>
+                          {["Fajr","Maghrib"].includes(p) && <span style={{ color:GOLD }}>+ Morning/Evening  </span>}
+                          {ADHKAR_SALAH_DUAS[p] && <span style={{ color:"#7c3aed" }}>+ Special dua</span>}
+                        </div>
+                      </div>
+                      <span style={{ fontSize:15, color:T.muted }}>›</span>
+                    </button>
+                  ); })}
+                </div>
+                <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
+                  <div style={{ flex:1, height:1, background:T.border }} />
+                  <span style={{ fontSize:9, color:T.muted, fontFamily:"sans-serif", letterSpacing:1 }}>OTHER</span>
+                  <div style={{ flex:1, height:1, background:T.border }} />
+                </div>
+                <div style={{ display:"flex", gap:8 }}>
+                  {[{key:"sleep",icon:"🌙",label:"Before Sleep",n:ADHKAR_SLEEP.length},{key:"adhan",icon:"📣",label:"After Adhan",n:ADHKAR_ADHAN.length}].map(function(item) { return (
+                    <button key={item.key} onClick={() => { setAdhkarSetKey(item.key); setAdhkarScreen("count"); }}
+                      style={{ flex:1, padding:"13px 10px", background:T.card, border:"1px solid "+T.border, borderRadius:13, cursor:"pointer", textAlign:"center" }}>
+                      <div style={{ fontSize:22, marginBottom:5 }}>{item.icon}</div>
+                      <div style={{ fontSize:12, fontWeight:700, color:T.text, fontFamily:"'Lora',serif" }}>{item.label}</div>
+                      <div style={{ fontSize:10, color:T.muted, fontFamily:"sans-serif", marginTop:2 }}>{item.n} adhkar</div>
+                    </button>
+                  ); })}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ══ SETTINGS ══ */}
+        {tab === "settings" && (
+          <div style={{ padding:"10px 14px 0" }}>
+
+            {/* Mode */}
+            <div style={{ background:T.card, borderRadius:14, border:"1px solid " + T.border, overflow:"hidden", marginBottom:12 }}>
+              <div style={{ padding:"10px 14px 8px", borderBottom:"1px solid " + T.border, fontSize:10, letterSpacing:3, textTransform:"uppercase", fontWeight:700, fontFamily:"sans-serif", color:GOLD }}>Mode</div>
+              <div style={{ padding:"12px 14px", display:"flex", flexDirection:"column", gap:8 }}>
+                {[
+                  { key:"classic",  icon:"☪️",  label:"Classic",  desc:"Full tracker, no points" },
+                  { key:"gamified", icon:"⭐",  label:"Journey",  desc:"Points, garden & badges" },
+                  { key:"kids",     icon:"🌱",  label:"Kids",     desc:"Prayers & house in Jannah" },
+                ].map(function(m) {
+                  const active = mode === m.key;
+                  const ac = m.key==="kids" ? "#f59e0b" : m.key==="gamified" ? "#6366f1" : GOLD;
+                  return (
+                    <button key={m.key} onClick={() => setMode(m.key)} style={{
+                      display:"flex", alignItems:"center", gap:12, padding:"12px 14px",
+                      borderRadius:12, border:"2px solid " + (active ? ac : T.border),
+                      background: active ? ac + "12" : T.alt,
+                      cursor:"pointer", textAlign:"left", transition:"all 0.18s",
+                    }}>
+                      <span style={{ fontSize:22 }}>{m.icon}</span>
+                      <div style={{ flex:1 }}>
+                        <div style={{ fontSize:14, fontWeight:700, color: active ? ac : T.text, fontFamily:"'Lora',serif" }}>{m.label}</div>
+                        <div style={{ fontSize:11, color:T.muted, fontFamily:"sans-serif" }}>{m.desc}</div>
+                      </div>
+                      {active && <span style={{ fontSize:16, color:ac }}>✓</span>}
+                    </button>
                   );
                 })}
               </div>
+            </div>
+
+            {/* Gender */}
+            <div style={{ background:T.card, borderRadius:14, border:"1px solid " + T.border, overflow:"hidden", marginBottom:12 }}>
+              <div style={{ padding:"10px 14px 8px", borderBottom:"1px solid " + T.border, fontSize:10, letterSpacing:3, textTransform:"uppercase", fontWeight:700, fontFamily:"sans-serif", color:GOLD }}>Gender</div>
+              <div style={{ padding:"12px 14px", display:"flex", gap:10 }}>
+                {[
+                  { key:"male",   icon:"🧔", label:"Akhi",   desc:"Brother · Includes Jumu'ah" },
+                  { key:"female", icon:"🧕", label:"Ukhti",  desc:"Sister · Includes exemption days" },
+                ].map(function(g) {
+                  const active = gender === g.key;
+                  return (
+                    <button key={g.key} onClick={() => setGender(g.key)} style={{
+                      flex:1, padding:"12px 10px", borderRadius:12,
+                      border:"2px solid " + (active ? GOLD : T.border),
+                      background: active ? GOLD + "12" : T.alt,
+                      cursor:"pointer", textAlign:"center", transition:"all 0.18s",
+                    }}>
+                      <div style={{ fontSize:26, marginBottom:4 }}>{g.icon}</div>
+                      <div style={{ fontSize:13, fontWeight:700, color: active ? GOLD : T.text, fontFamily:"'Lora',serif" }}>{g.label}</div>
+                      <div style={{ fontSize:10, color:T.muted, fontFamily:"sans-serif", marginTop:2 }}>{g.desc}</div>
+                    </button>
+                  );
+                })}
+              </div>
+              {/* Exemption day toggle — only for females */}
+              {isFemale && (
+                <div style={{ padding:"0 14px 12px" }}>
+                  <button onClick={toggleExempt} style={{
+                    display:"flex", alignItems:"center", gap:10, width:"100%",
+                    padding:"11px 13px",
+                    background: isExempt ? "#fdf2f8" : T.alt,
+                    border:"1px solid " + (isExempt ? "#f9a8d4" : T.border),
+                    borderRadius:11, cursor:"pointer", textAlign:"left", transition:"all 0.18s",
+                  }}>
+                    <span style={{ fontSize:18 }}>🌸</span>
+                    <div style={{ flex:1 }}>
+                      <div style={{ fontSize:12, fontWeight:700, color: isExempt ? "#be185d" : T.sub, fontFamily:"'Lora',serif" }}>
+                        {isExempt ? "Exemption day — active today" : "Mark today as exemption day"}
+                      </div>
+                      <div style={{ fontSize:10, color: isExempt ? "#ec4899" : T.muted, fontFamily:"sans-serif", marginTop:1 }}>
+                        Prayers hidden · Du'a and dhikr remain open
+                      </div>
+                    </div>
+                    <div style={{ width:22, height:22, borderRadius:6, flexShrink:0,
+                      background: isExempt ? "#ec4899" : "transparent",
+                      border:"2px solid " + (isExempt ? "#ec4899" : T.border),
+                      display:"flex", alignItems:"center", justifyContent:"center",
+                      fontSize:12, color:"#fff", transition:"all 0.18s" }}>
+                      {isExempt ? "✓" : ""}
+                    </div>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Appearance */}
+            <div style={{ background:T.card, borderRadius:14, border:"1px solid " + T.border, overflow:"hidden", marginBottom:12 }}>
+              <div style={{ padding:"10px 14px 8px", borderBottom:"1px solid " + T.border, fontSize:10, letterSpacing:3, textTransform:"uppercase", fontWeight:700, fontFamily:"sans-serif", color:GOLD }}>Appearance</div>
+              <div style={{ padding:"12px 14px" }}>
+                <div style={{ fontSize:11, color:T.sub, fontFamily:"sans-serif", marginBottom:8 }}>Theme</div>
+                <div style={{ display:"flex", gap:8, marginBottom:16 }}>
+                  {[["light","☀️","Light"],["dark","🌙","Dark"]].map(function(t) {
+                    const active = theme === t[0];
+                    return (
+                      <button key={t[0]} onClick={() => setTheme(t[0])} style={{
+                        flex:1, padding:"10px", borderRadius:10,
+                        border:"2px solid " + (active ? GOLD : T.border),
+                        background: active ? GOLD + "12" : T.alt,
+                        cursor:"pointer", fontSize:13, fontFamily:"'Lora',serif",
+                        color: active ? GOLD : T.text, fontWeight: active ? 700 : 400,
+                        transition:"all 0.18s",
+                      }}>
+                        {t[1]} {t[2]}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div style={{ fontSize:11, color:T.sub, fontFamily:"sans-serif", marginBottom:8 }}>Text Size</div>
+                <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+                  <span style={{ fontSize:12, color:T.muted, fontFamily:"'Amiri',serif" }}>أ</span>
+                  <input type="range" min="0.85" max="1.25" step="0.05" value={fontScale}
+                    onChange={e => setFontScale(parseFloat(e.target.value))}
+                    style={{ flex:1, accentColor:GOLD, cursor:"pointer" }} />
+                  <span style={{ fontSize:18, color:T.muted, fontFamily:"'Amiri',serif" }}>أ</span>
+                </div>
+                <div style={{ display:"flex", justifyContent:"space-between", marginTop:6 }}>
+                  <span style={{ fontSize:9, color:T.muted, fontFamily:"sans-serif", letterSpacing:1 }}>SMALL</span>
+                  <span style={{ fontSize:10, color:GOLD, fontFamily:"sans-serif", fontWeight:700 }}>
+                    {fontScale === 1.0 ? "Default" : fontScale > 1.0 ? "+" + Math.round((fontScale-1)*100) + "%" : Math.round((fontScale-1)*100) + "%"}
+                  </span>
+                  <span style={{ fontSize:9, color:T.muted, fontFamily:"sans-serif", letterSpacing:1 }}>LARGE</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Prayer times settings */}
+            <div style={{ background:T.card, borderRadius:14, border:"1px solid " + T.border, overflow:"hidden", marginBottom:12 }}>
+              <div style={{ padding:"10px 14px 8px", borderBottom:"1px solid " + T.border, fontSize:10, letterSpacing:3, textTransform:"uppercase", fontWeight:700, fontFamily:"sans-serif", color:GOLD }}>Prayer Times</div>
+              <div style={{ padding:"12px 14px" }}>
+                <div style={{ marginBottom:12 }}>
+                  <div style={{ fontSize:11, color:T.sub, fontFamily:"sans-serif", marginBottom:6 }}>Calculation Method</div>
+                  <select value={calcMethod} onChange={e => setCalcMethod(parseInt(e.target.value,10))} style={{ width:"100%", padding:"9px 10px", border:"1px solid " + T.border, borderRadius:8, background:T.alt, color:T.text, fontSize:12, fontFamily:"sans-serif" }}>
+                    <option value={1}>University of Islamic Sciences, Karachi</option>
+                    <option value={2}>Islamic Society of North America (ISNA)</option>
+                    <option value={3}>Muslim World League (MWL)</option>
+                    <option value={4}>Umm Al-Qura, Makkah</option>
+                    <option value={5}>Egyptian General Authority</option>
+                    <option value={7}>Institute of Geophysics, Tehran</option>
+                    <option value={8}>Gulf Region</option>
+                    <option value={9}>Kuwait</option>
+                    <option value={10}>Qatar</option>
+                    <option value={11}>Majlis Ugama Islam Singapura</option>
+                    <option value={12}>Union des Organisations Islamiques de France</option>
+                    <option value={13}>Diyanet İşleri Başkanlığı, Turkey</option>
+                    <option value={15}>Spiritual Administration of Muslims of Russia</option>
+                    <option value={16}>Moonsighting Committee Worldwide</option>
+                  </select>
+                </div>
+                <div>
+                  <div style={{ fontSize:11, color:T.sub, fontFamily:"sans-serif", marginBottom:6 }}>Asr Calculation (Madhab)</div>
+                  <div style={{ display:"flex", gap:8 }}>
+                    <button onClick={() => setMadhab(0)} style={{ flex:1, padding:"8px", borderRadius:8, border:"1px solid " + T.border, background: madhab===0 ? GOLD : T.alt, color: madhab===0 ? "#fff" : T.text, cursor:"pointer", fontSize:12, fontFamily:"sans-serif", fontWeight: madhab===0 ? 600 : 400 }}>Hanafi</button>
+                    <button onClick={() => setMadhab(1)} style={{ flex:1, padding:"8px", borderRadius:8, border:"1px solid " + T.border, background: madhab===1 ? GOLD : T.alt, color: madhab===1 ? "#fff" : T.text, cursor:"pointer", fontSize:12, fontFamily:"sans-serif", fontWeight: madhab===1 ? 600 : 400 }}>Shafi / Maliki / Hanbali</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Hijri date override */}
+            <div style={{ background:T.card, borderRadius:14, border:"1px solid " + T.border, overflow:"hidden", marginBottom:12 }}>
+              <div style={{ padding:"10px 14px 8px", borderBottom:"1px solid " + T.border, fontSize:10, letterSpacing:3, textTransform:"uppercase", fontWeight:700, fontFamily:"sans-serif", color:GOLD }}>Hijri Date</div>
+              <div style={{ padding:"12px 14px" }}>
+                <div style={{ fontSize:11, color:T.muted, fontFamily:"sans-serif", marginBottom:10 }}>
+                  Current: {hijri.day} {HM_EN[hijri.month-1]} {hijri.year} AH
+                </div>
+                <div style={{ display:"flex", gap:8, marginBottom:8 }}>
+                  {[["Day","day","1","30",44],["Month","month","1","12",44],["Year","year","1400","1500",60]].map(function(f) {
+                    return (
+                      <div key={f[0]} style={{ textAlign:"center" }}>
+                        <div style={{ fontSize:9, color:T.muted, fontFamily:"sans-serif", marginBottom:3 }}>{f[0]}</div>
+                        <input type="number" min={f[2]} max={f[3]}
+                          value={hijriDraft[f[1]] || ""}
+                          placeholder={String(hijri[f[1]])}
+                          onChange={e => setHijriDraft(function(p){ return {...p, [f[1]]:e.target.value}; })}
+                          style={{ width:f[4], padding:"6px 4px", border:"1px solid " + T.border, borderRadius:6, background:T.alt, color:T.text, fontSize:13, textAlign:"center" }} />
+                      </div>
+                    );
+                  })}
+                </div>
+                <button onClick={() => {
+                  const d = parseInt(hijriDraft.day,10), m = parseInt(hijriDraft.month,10), y = parseInt(hijriDraft.year,10);
+                  if (d>=1&&d<=30&&m>=1&&m<=12&&y>=1400) { setHijri({ day:d, month:m, year:y }); }
+                }} style={{ width:"100%", padding:"8px", background:GOLD, border:"none", borderRadius:8, color:"#fff", cursor:"pointer", fontSize:13, fontWeight:600 }}>
+                  Update Hijri Date ✓
+                </button>
+              </div>
+            </div>
+
+            {/* Kids PIN (only if kids mode) */}
+            {mode === "kids" && (
+              <div style={{ background:T.card, borderRadius:14, border:"1px solid " + T.border, overflow:"hidden", marginBottom:12 }}>
+                <div style={{ padding:"10px 14px 8px", borderBottom:"1px solid " + T.border, fontSize:10, letterSpacing:3, textTransform:"uppercase", fontWeight:700, fontFamily:"sans-serif", color:GOLD }}>Kids Settings</div>
+                <div style={{ padding:"12px 14px" }}>
+                  <div style={{ fontSize:11, color:T.sub, fontFamily:"sans-serif", marginBottom:6 }}>Change Parent PIN</div>
+                  <input type="password" maxLength={4} placeholder="New 4-digit PIN"
+                    onChange={e => { if(e.target.value.length===4) setKidsPin(e.target.value); }}
+                    style={{ width:"100%", padding:"9px", border:"1px solid " + T.border, borderRadius:8, background:T.alt, color:T.text, fontSize:14, textAlign:"center", letterSpacing:6, marginBottom:8 }} />
+                </div>
+              </div>
+            )}
+
+            {/* App info */}
+            <div style={{ textAlign:"center", padding:"12px 0 4px", color:T.muted, fontFamily:"sans-serif", fontSize:11 }}>
+              <div style={{ fontSize:18, marginBottom:4 }}>🌙</div>
+              <div style={{ fontFamily:"'Amiri',serif", fontSize:16, color:GOLD, marginBottom:2 }}>يَوْم · Yawm</div>
+              <div>My Daily Deeds · جزاك الله خيرًا</div>
+            </div>
+
+          </div>
+        )}
+
+        {/* ══ DUA ══ */}
+        {tab === "dua" && (() => {
+          const cats = [...new Set(DUAS.map(d=>d.cat))];
+          return (
+            <div style={{ padding:"10px 14px 0" }}>
+              <button onClick={() => setTab("more")} style={{ display:"flex", alignItems:"center", gap:6, background:"none", border:"none", cursor:"pointer", color:T.muted, fontSize:12, fontFamily:"sans-serif", padding:"0 0 10px", marginTop:4 }}>← Back</button>
+
+              {/* Dua of the day */}
+              <div style={{ background:T.card, borderRadius:16, border:"1px solid "+T.border, padding:"18px 16px", textAlign:"center", marginBottom:12 }}>
+                <div style={{ fontSize:9, letterSpacing:3, textTransform:"uppercase", fontFamily:"sans-serif", color:T.muted, marginBottom:12 }}>Dua of the Day</div>
+                <div style={{ fontSize:20, color:GOLD, lineHeight:"2.1", marginBottom:12, fontFamily:"'Amiri Quran','Amiri',serif", direction:"rtl", padding:"0 8px" }}>{DUA.ar}</div>
+                <div style={{ fontSize:13, color:T.sub, fontStyle:"italic", lineHeight:"1.7", marginBottom:8, fontFamily:"'Lora',serif" }}>"{DUA.en}"</div>
+                <div style={{ fontSize:10, color:T.muted, fontFamily:"sans-serif" }}>— {DUA.src}</div>
+              </div>
+
+              {/* Full dua collection */}
+              <div style={{ fontSize:9, letterSpacing:3, textTransform:"uppercase", fontWeight:700, fontFamily:"sans-serif", color:GOLD, marginBottom:10 }}>Dua Collection</div>
+              {cats.map(cat => (
+                <div key={cat} style={{ background:T.card, borderRadius:13, border:"1px solid "+T.border, overflow:"hidden", marginBottom:10 }}>
+                  <div style={{ padding:"8px 14px 6px", borderBottom:"1px solid "+T.border, fontSize:10, letterSpacing:2, textTransform:"uppercase", fontWeight:700, fontFamily:"sans-serif", color:T.sub }}>{cat}</div>
+                  {DUAS.filter(d=>d.cat===cat).map((dua,i,arr) => (
+                    <div key={i} style={{ padding:"12px 14px", borderBottom:i<arr.length-1?"1px solid "+T.borderL:"none" }}>
+                      <div style={{ fontSize:16, color:T.text, fontFamily:"'Amiri Quran','Amiri',serif", direction:"rtl", lineHeight:"2", marginBottom:6, textAlign:"right" }}>{dua.ar}</div>
+                      <div style={{ fontSize:12, color:T.sub, fontStyle:"italic", fontFamily:"'Lora',serif", lineHeight:"1.6", marginBottom:4 }}>"{dua.en}"</div>
+                      <div style={{ fontSize:10, color:T.muted, fontFamily:"sans-serif" }}>— {dua.src}</div>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          );
+        })()}
+
+        {/* ══ 99 NAMES ══ */}
+        {tab === "names99" && (
+          <div style={{ padding:"10px 14px 0" }}>
+            <button onClick={() => setTab("more")} style={{ display:"flex", alignItems:"center", gap:6, background:"none", border:"none", cursor:"pointer", color:T.muted, fontSize:12, fontFamily:"sans-serif", padding:"0 0 10px", marginTop:4 }}>← Back</button>
+            <div style={{ background:GOLD+"12", borderRadius:13, border:"1px solid "+GOLD+"33", padding:"12px 14px", textAlign:"center", marginBottom:12 }}>
+              <div style={{ fontSize:16, color:GOLD, fontFamily:"'Amiri Quran','Amiri',serif", direction:"rtl", lineHeight:"2" }}>وَلِلَّهِ الْأَسْمَاءُ الْحُسْنَىٰ فَادْعُوهُ بِهَا</div>
+              <div style={{ fontSize:10, color:T.muted, fontFamily:"sans-serif", fontStyle:"italic", marginTop:4 }}>"To Allah belong the Most Beautiful Names, so call upon Him by them." — 7:180</div>
+            </div>
+            <div style={{ background:T.card, borderRadius:13, border:"1px solid "+T.border, overflow:"hidden" }}>
+              {ASMA.map((name,i) => (
+                <div key={name.n} style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 14px",
+                  borderBottom:i<ASMA.length-1?"1px solid "+T.borderL:"none",
+                  background:i%2===0?T.alt:"transparent" }}>
+                  <div style={{ width:26, height:26, borderRadius:8, flexShrink:0,
+                    background:GOLD+"22", border:"1px solid "+GOLD+"44",
+                    display:"flex", alignItems:"center", justifyContent:"center",
+                    fontSize:10, fontWeight:700, color:GOLD, fontFamily:"sans-serif" }}>{name.n}</div>
+                  <div style={{ flex:1 }}>
+                    <div style={{ display:"flex", alignItems:"baseline", gap:8, marginBottom:2 }}>
+                      <span style={{ fontSize:15, color:T.text, fontFamily:"'Amiri',serif" }}>{name.ar}</span>
+                      <span style={{ fontSize:11, fontWeight:700, color:GOLD, fontFamily:"sans-serif" }}>{name.en}</span>
+                    </div>
+                    <div style={{ fontSize:10, color:T.muted, fontFamily:"sans-serif" }}>{name.meaning}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ══ TASBIH ══ */}
+        {tab === "tasbih" && (
+          <div style={{ padding:"10px 14px 0" }}>
+            <button onClick={() => setTab("more")} style={{ background:"none", border:"none", cursor:"pointer", color:T.muted, fontSize:12, fontFamily:"sans-serif", padding:"0 0 10px", display:"flex", alignItems:"center", gap:4 }}>← Back</button>
+
+            {/* Phrase selector */}
+            <div style={{ display:"flex", gap:6, marginBottom:14 }}>
+              {TASBIH_PHRASES.map(function(p, i) {
+                const active = tasbihPhrase === i;
+                return (
+                  <button key={i} onClick={() => { setTasbihPhrase(i); setTasbihCount(0); setTasbihTarget(i===2?34:33); }} style={{
+                    flex:1, padding:"8px 4px", borderRadius:10,
+                    border:"2px solid " + (active ? p.color : T.border),
+                    background: active ? p.color+"18" : T.alt,
+                    cursor:"pointer", textAlign:"center", transition:"all 0.18s",
+                  }}>
+                    <div style={{ fontSize:13, color:active?p.color:T.muted, fontFamily:"'Amiri',serif" }}>{p.ar}</div>
+                    <div style={{ fontSize:9, color:active?p.color:T.muted, fontFamily:"sans-serif", marginTop:2, fontWeight:active?700:400 }}>{p.tr} ×{i===2?34:33}</div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Big tap button */}
+            <button onClick={tasbihTap} style={{
+              display:"flex", flexDirection:"column", alignItems:"center",
+              width:"100%", padding:"32px 0",
+              background: tasbihFlash ? TASBIH_PHRASES[tasbihPhrase].color+"22" : T.alt,
+              border:"2px dashed " + (tasbihFlash ? TASBIH_PHRASES[tasbihPhrase].color : T.border),
+              borderRadius:20, cursor:"pointer", transition:"all 0.2s", marginBottom:12,
+            }}>
+              <div style={{ fontSize:28, fontFamily:"'Amiri Quran','Amiri',serif",
+                color:TASBIH_PHRASES[tasbihPhrase].color, direction:"rtl",
+                lineHeight:"1.8", marginBottom:12, transition:"all 0.2s",
+                transform: tasbihFlash ? "scale(1.04)" : "scale(1)" }}>
+                {TASBIH_PHRASES[tasbihPhrase].ar}
+              </div>
+              <div style={{ fontSize:48, fontWeight:800, color:TASBIH_PHRASES[tasbihPhrase].color,
+                fontFamily:"sans-serif", lineHeight:1, marginBottom:4 }}>
+                {tasbihCount}
+              </div>
+              <div style={{ fontSize:13, color:T.muted, fontFamily:"sans-serif" }}>
+                / {tasbihTarget}
+              </div>
+              <div style={{ marginTop:12, fontSize:11, color:T.muted, fontFamily:"sans-serif", letterSpacing:1 }}>
+                TAP ANYWHERE HERE
+              </div>
+            </button>
+
+            {/* Progress bar */}
+            <div style={{ height:6, background:T.alt, borderRadius:3, overflow:"hidden", marginBottom:12 }}>
+              <div style={{ height:"100%", borderRadius:3,
+                background:TASBIH_PHRASES[tasbihPhrase].color,
+                width:Math.round((tasbihCount/tasbihTarget)*100)+"%",
+                transition:"width 0.2s" }} />
+            </div>
+
+            {/* Reset */}
+            <div style={{ display:"flex", gap:8 }}>
+              <button onClick={() => setTasbihCount(0)} style={{ flex:1, padding:"11px",
+                background:T.alt, border:"1px solid "+T.border, borderRadius:10,
+                color:T.muted, cursor:"pointer", fontSize:12, fontFamily:"sans-serif" }}>
+                ↺ Reset
+              </button>
+              <button onClick={() => { setTasbihCount(0); setTasbihPhrase(0); setTasbihTarget(33); }} style={{ flex:1, padding:"11px",
+                background:T.alt, border:"1px solid "+T.border, borderRadius:10,
+                color:T.muted, cursor:"pointer", fontSize:12, fontFamily:"sans-serif" }}>
+                ↺ Full reset
+              </button>
+            </div>
+
+            {/* Hadith */}
+            <div style={{ background:GOLD+"10", borderRadius:12, border:"1px solid "+GOLD+"33",
+              padding:"12px 14px", marginTop:12, textAlign:"center" }}>
+              <div style={{ fontSize:13, color:GOLD, fontFamily:"'Amiri',serif",
+                direction:"rtl", lineHeight:"2", marginBottom:4 }}>
+                مَنْ قَالَ سُبْحَانَ اللَّهِ وَبِحَمْدِهِ فِي يَوْمٍ مِائَةَ مَرَّةٍ
+              </div>
+              <div style={{ fontSize:10, color:T.muted, fontFamily:"sans-serif", fontStyle:"italic" }}>
+                "Whoever says SubhanAllahi wa bihamdihi 100 times — his sins are wiped away even if like sea foam" — Bukhari 6405
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ══ QIBLA ══ */}
+        {tab === "qibla" && (
+          <div style={{ padding:"10px 14px 0" }}>
+            <button onClick={() => setTab("more")} style={{ background:"none", border:"none", cursor:"pointer", color:T.muted, fontSize:12, fontFamily:"sans-serif", padding:"0 0 10px", display:"flex", alignItems:"center", gap:4 }}>← Back</button>
+            <QiblaFinder T={T} GOLD={GOLD} />
+          </div>
+        )}
+
+        {/* ══ ISLAMIC MONTHS ══ */}
+        {tab === "months" && (
+          <div style={{ padding:"10px 14px 0" }}>
+            <button onClick={() => setTab("more")} style={{ background:"none", border:"none", cursor:"pointer", color:T.muted, fontSize:12, fontFamily:"sans-serif", padding:"0 0 10px", display:"flex", alignItems:"center", gap:4 }}>← Back</button>
+            <div style={{ background:T.card, borderRadius:14, border:"1px solid "+T.border, overflow:"hidden", marginBottom:12 }}>
+              <div style={{ padding:"10px 14px 8px", borderBottom:"1px solid "+T.border, fontSize:10, letterSpacing:3, textTransform:"uppercase", fontWeight:700, fontFamily:"sans-serif", color:GOLD }}>
+                Hijri Calendar — {hijri.year} AH
+              </div>
+              {HM_EN.map(function(m, i) {
+                const cur = hijri.month - 1 === i;
+                return (
+                  <div key={i} style={{ display:"flex", alignItems:"center", gap:12, padding:"11px 14px",
+                    borderBottom: i < 11 ? "1px solid "+T.borderL : "none",
+                    background: cur ? GOLD+"12" : "transparent" }}>
+                    <div style={{ width:28, height:28, borderRadius:8, flexShrink:0,
+                      background: cur ? GOLD : T.alt, border:"1px solid "+(cur?GOLD:T.border),
+                      display:"flex", alignItems:"center", justifyContent:"center",
+                      fontSize:11, fontWeight:700, color:cur?"#fff":T.muted, fontFamily:"sans-serif" }}>{i+1}</div>
+                    <div style={{ flex:1 }}>
+                      <div style={{ fontSize:13, fontWeight:cur?700:500, color:cur?GOLD:T.text, fontFamily:"'Lora',serif" }}>{m}</div>
+                    </div>
+                    <div style={{ fontSize:16, color:cur?GOLD:T.muted, fontFamily:"'Amiri',serif" }}>{HM_AR[i]}</div>
+                    {cur && <span style={{ fontSize:9, color:"#fff", background:GOLD, padding:"2px 6px", borderRadius:6, fontFamily:"sans-serif", fontWeight:700 }}>NOW</span>}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
