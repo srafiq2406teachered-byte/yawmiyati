@@ -1,4 +1,5 @@
 /* eslint-disable no-restricted-globals */
+/* global clients */
 const CACHE_NAME = "yawm-v2";
 const ASSETS = ["/","/index.html","/static/js/main.chunk.js","/static/js/bundle.js","/manifest.json"];
 
