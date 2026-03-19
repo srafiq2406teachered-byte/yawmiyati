@@ -1,73 +1,83 @@
 /* eslint-disable no-restricted-globals */
+const CACHE_NAME = "yawm-v2";
+const ASSETS = ["/","/index.html","/static/js/main.chunk.js","/static/js/bundle.js","/manifest.json"];
 
-/**
- * MANDATORY FOR VERCEL/CRA BUILDS:
- * The build tool (Workbox) looks for 'self.__WB_MANIFEST'. 
- * Even if we don't use it for our manual cache, it MUST be referenced.
- */
-const _ignore = self.__WB_MANIFEST;
-
-const CACHE_NAME = "yawmiyati-v1";
-
-// Only cache static, unchanging files here.
-// Don't hardcode "main.chunk.js" because the name changes every build!
-const ASSETS = [
-  "/",
-  "/index.html",
-  "/manifest.json",
-  "/favicon.ico",
-  "/logo192.png",
-  "/logo512.png"
-];
-
-// Install — cache core assets
-self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS);
-    })
-  );
+self.addEventListener("install", function(event) {
+  event.waitUntil(caches.open(CACHE_NAME).then(function(cache) { return cache.addAll(ASSETS); }));
   self.skipWaiting();
 });
 
-// Activate — clean old caches
-self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.filter((key) => key !== CACHE_NAME)
-            .map((key) => caches.delete(key))
-      );
-    })
-  );
+self.addEventListener("activate", function(event) {
+  event.waitUntil(caches.keys().then(function(keys) {
+    return Promise.all(keys.filter(function(key) { return key !== CACHE_NAME; }).map(function(key) { return caches.delete(key); }));
+  }));
   self.clients.claim();
 });
 
-// Fetch — serve from cache, fall back to network
-self.addEventListener("fetch", (event) => {
-  // Skip non-GET and cross-origin requests (like Aladhan API)
+self.addEventListener("fetch", function(event) {
   if (event.request.method !== "GET") return;
   if (!event.request.url.startsWith(self.location.origin)) return;
-
   event.respondWith(
-    caches.match(event.request).then((cached) => {
+    caches.match(event.request).then(function(cached) {
       if (cached) return cached;
-
-      return fetch(event.request).then((response) => {
-        // Cache successful responses for future offline use
-        if (response && response.status === 200 && response.type === 'basic') {
+      return fetch(event.request).then(function(response) {
+        if (response && response.status === 200) {
           const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, clone);
-          });
+          caches.open(CACHE_NAME).then(function(cache) { cache.put(event.request, clone); });
         }
         return response;
-      }).catch(() => {
-        // Offline fallback for navigation requests
-        if (event.request.mode === 'navigate') {
-          return caches.match("/index.html");
-        }
       });
+    }).catch(function() { return caches.match("/index.html"); })
+  );
+});
+
+// ── Push notifications ────────────────────────────────────────────────────────
+self.addEventListener("push", function(event) {
+  const data = event.data ? event.data.json() : {};
+  event.waitUntil(
+    self.registration.showNotification(data.title || "يَوْم · Yawm", {
+      body: data.body || "Time for your daily deeds",
+      icon: "/icon-192.png",
+      badge: "/icon-192.png",
+      tag: data.tag || "yawm-reminder",
+      data: { url: data.url || "/" },
+      vibrate: [100, 50, 100],
     })
   );
+});
+
+self.addEventListener("notificationclick", function(event) {
+  event.notification.close();
+  event.waitUntil(
+    clients.matchAll({ type: "window" }).then(function(windowClients) {
+      for (let i = 0; i < windowClients.length; i++) {
+        if (windowClients[i].url === "/" && "focus" in windowClients[i]) {
+          return windowClients[i].focus();
+        }
+      }
+      if (clients.openWindow) return clients.openWindow("/");
+    })
+  );
+});
+
+// ── Scheduled local notifications via setTimeout ──────────────────────────────
+// Receives schedule messages from the app
+self.addEventListener("message", function(event) {
+  if (event.data && event.data.type === "SCHEDULE_NOTIFICATIONS") {
+    const prayers = event.data.prayers || [];
+    prayers.forEach(function(p) {
+      const delay = p.time - Date.now();
+      if (delay > 0 && delay < 24 * 60 * 60 * 1000) {
+        setTimeout(function() {
+          self.registration.showNotification("يَوْم · " + p.name + " Time", {
+            body: p.body,
+            icon: "/icon-192.png",
+            badge: "/icon-192.png",
+            tag: "yawm-" + p.id,
+            vibrate: [100, 50, 100],
+          });
+        }, delay);
+      }
+    });
+  }
 });
